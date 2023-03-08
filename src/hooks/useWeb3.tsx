@@ -12,7 +12,7 @@ import { API, Wallet, Ens } from 'bnc-onboard/dist/src/interfaces'
 import { ContractState, getContractState, updatePrice } from '../utils/contract'
 import { initOnboard } from '../utils/initOnboard'
 import Abi from '../abi/MemeNumbersAbi.json'
-import Config from '../config'
+import Config, { GETH_DEV } from '../config'
 
 interface ContextData {
     address?: string
@@ -46,7 +46,7 @@ const Web3Context = React.createContext<Context>([
         ready: async () => {
             return false
         },
-        disconnect: () => {},
+        disconnect: () => { },
     },
 ])
 export const Web3Provider: React.FC<{}> = ({ children }) => {
@@ -108,7 +108,7 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
             'selectedWallet'
         )
         if (previouslySelectedWallet && onboard) {
-            ;(async () => {
+            ; (async () => {
                 await onboard.walletSelect(previouslySelectedWallet)
                 await onboard.walletCheck()
             })()
@@ -116,14 +116,18 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
     }, [onboard])
 
     useEffect(() => {
-        ;(async () => {
+        ; (async () => {
             console.log('network changed: ', network)
             if (!network || !onboard) return
 
             onboard.config({ networkId: network })
             defaultContract.removeAllListeners()
             defaultProvider.removeAllListeners()
-            defaultProvider = new providers.InfuraProvider(network)
+            if (network == GETH_DEV) {
+                defaultProvider = new providers.JsonRpcProvider("http://192.168.50.147:8545", network)
+            } else {
+                defaultProvider = new providers.InfuraProvider(network)
+            }
             defaultContract = new ethers.Contract(
                 Config(network).contractAddress!,
                 Abi,
