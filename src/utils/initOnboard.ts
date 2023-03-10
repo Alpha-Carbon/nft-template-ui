@@ -1,5 +1,6 @@
 import Onboard from 'bnc-onboard'
 import { Subscriptions } from 'bnc-onboard/dist/src/interfaces'
+import carbonWallet from './carbonWallet'
 
 const networkId = 4
 const infuraId = 'de6e66cb509c43e0897d062c93f15d9e'
@@ -15,6 +16,7 @@ export function initOnboard(subscriptions: Subscriptions) {
         subscriptions,
         walletSelect: {
             wallets: [
+                carbonWallet,
                 { walletName: 'metamask', preferred: true },
                 {
                     walletName: 'walletConnect',
