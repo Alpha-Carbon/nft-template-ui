@@ -34,7 +34,7 @@ const config = {
         contractAddress: undefined,
     },
     gethDev: {
-        contractAddress: '0xa1775D5E2571331fA82E2911C3074a8507d1ab19',
+        contractAddress: '0xb06F11690A52Db3AcAB0B9B95B79585A59F43747',
     },
 }
 

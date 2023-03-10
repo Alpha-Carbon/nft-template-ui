@@ -11,7 +11,7 @@ import { API, Wallet, Ens } from 'bnc-onboard/dist/src/interfaces'
 
 import { ContractState, getContractState, updatePrice } from '../utils/contract'
 import { initOnboard } from '../utils/initOnboard'
-import Abi from '../abi/MemeNumbersAbi.json'
+import Abi from '../abi/NftTemplateAbi.json'
 import Config, { GETH_DEV } from '../config'
 
 interface ContextData {
