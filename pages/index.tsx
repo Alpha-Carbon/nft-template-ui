@@ -45,11 +45,11 @@ const Home: Page = () => {
                         />
 
                         <Segment />
-                        <Operations
+                        {/* <Operations
                             account={address}
                             contract={contract}
                             readyToTransact={actions.ready}
-                        />
+                        /> */}
                     </div>
                 )}
             </Main>
