@@ -6,69 +6,69 @@ import styled from 'styled-components'
 import Web3Connect from './Web3Connect'
 import useWeb3 from '../hooks/useWeb3'
 import config, { MAINNET, RINKEBY } from '../config'
-import { FrederickaFont } from '../components'
+import { DefaultFont } from '../components'
 
 const Container = styled.div`
     display: flex;
     flex-direction: row;
 
-    @media (max-width: 768px) {
+    @media (max-width: 576px) {
         flex-direction: column;
     }
 `
 
 const Navigation = styled(Container)`
-    ${FrederickaFont}
+    ${DefaultFont}
 
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     align-items: center;
     justify-content: space-between;
-    padding: 10px;
-    width: calc(100% - 20px);
+    padding: 24px 40px;
+    background-color: #2B396A;
 `
 
-const Footer = styled(Navigation)`
-    justify-content: flex-end;
+const Logo = styled.a`
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 48px;
+    margin-left: 160px;
+    color: #FFFFFF;
+    text-decoration: none;
+    @media (max-width: 768px) {
+        margin: auto;
+    }
 `
 
 const NavItem = styled.a`
-    color: rgba(255, 255, 255, 1);
+    color: #FFFFFF;
 
-    font-size: 20px;
-    // margin: 0 15px 20px 0;
-    padding: 10px;
-
+    font-size: 16px;
+    margin-right: 40px;
     &:hover {
         opacity: 0.6;
     }
 `
 
-const FooterNavItem = styled(NavItem)`
-    border: 0;
-    font-size: 16px;
-    margin-bottom: 0;
-    padding: 10;
-`
-
 const Content = styled.div`
-    padding: 50px 10px;
-`
-
-const CenterNav = styled(Container)`
-    margin: auto;
-    justify-content: space-evenly;
-    order: 1;
+   margin-top: 176px;
+   @media (max-width: 576px) {
+        margin-top: 192px;
+        margin: 192px 16px 24px 16px;
+    }
 `
 
 const RightNav = styled(Container)`
     justify-content: space-evenly;
+    align-items: center;
     order: 1;
-`
-
-const Logo = styled.img`
-    margin-bottom: 20px;
-    // order: 1;
-    width: 340px;
-    height: 85px;
+    gap: 24px;
+    @media (max-width: 576px) {
+        flex-direction: row;
+        margin-top: 24px;
+    }
 `
 
 //#HACK for ghpages, we need to rewrite asset paths
@@ -82,73 +82,29 @@ const Layout: React.FC = ({ children }) => {
 
     const contractLink =
         network === RINKEBY
-            ? `https://rinkeby.etherscan.io/address/${
-                  config(RINKEBY).contractAddress
-              }`
-            : `https://etherscan.io/address/${
-                  config(MAINNET).contractAddress
-              }#code`
+            ? `https://rinkeby.etherscan.io/address/${config(RINKEBY).contractAddress
+            }`
+            : `https://etherscan.io/address/${config(MAINNET).contractAddress
+            }#code`
 
     return (
         <>
             <Navigation>
                 <Link href="/" passHref>
-                    <a>
-                        <Logo alt="MemeNumbers" src={'/assets/logo.png'} />
-                    </a>
+                    <Logo>
+                        NFTemplate
+                    </Logo>
                 </Link>
-
-                <CenterNav>
+                <RightNav>
                     <Link href={openSeaLink} passHref>
                         <NavItem target="_blank" rel="noopener noreferrer">
                             OpenSea
                         </NavItem>
                     </Link>
-                    <Link href="/faq" passHref>
-                        <NavItem>FAQ</NavItem>
-                    </Link>
-                </CenterNav>
-
-                <RightNav>
                     <Web3Connect />
                 </RightNav>
             </Navigation>
-
             <Content>{children}</Content>
-
-            <Footer>
-                <FooterNavItem
-                    href="https://twitter.com/memenumbersnft"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Twitter
-                </FooterNavItem>
-
-                <FooterNavItem
-                    href="https://discord.gg/EgA3TvxYTv"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Discord
-                </FooterNavItem>
-
-                <FooterNavItem
-                    href={contractLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Contract
-                </FooterNavItem>
-
-                <FooterNavItem
-                    href="https://www.github.com/NonFungibleSequences"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Github
-                </FooterNavItem>
-            </Footer>
         </>
     )
 }

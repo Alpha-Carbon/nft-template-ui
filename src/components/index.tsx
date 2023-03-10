@@ -1,19 +1,7 @@
 import styled, { css } from 'styled-components'
 
-export const PangolinFont = css`
-    color: rgba(255, 255, 255, 1);
-    font-family: Pangolin;
-    font-weight: Regular;
-`
-
-export const FrederickaFont = css`
-    color: rgba(255, 255, 255, 1);
-    font-family: Fredericka the Great;
-    font-weight: Regular;
-`
-
 export const DefaultFont = css`
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
         Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol';
 `
@@ -25,14 +13,21 @@ export const DefaultFontSpan = styled.span`
 
 export const EtherSymbol = () => <DefaultFontSpan>Ξ</DefaultFontSpan>
 
+export const SubTitle = styled.h3`
+    ${DefaultFont}
+    font-weight: 700;
+    font-size: 24px;
+    color: #222222;
+`
+
 export const Field = styled.p`
-    ${PangolinFont}
+    ${DefaultFont}
     font-size: 20px;
     opacity: 1;
 `
 
 export const Value = styled.p`
-    ${PangolinFont}
+    ${DefaultFont}
     color: rgba(166, 250, 255, 1);
     font-size: 26px;
     opacity: 1;
@@ -46,7 +41,7 @@ export const FieldSet = styled.fieldset`
 `
 
 export const Input = styled.input`
-    ${PangolinFont}
+    ${DefaultFont}
     font-size: inherit;
     padding: 0.3em 0.4em;
     margin: 0.1em 0.2em;
@@ -59,7 +54,7 @@ export const Input = styled.input`
 `
 
 export const Select = styled.select`
-    ${FrederickaFont}
+    ${DefaultFont}
     color: rgba(51, 51, 51, 1);
     background: rgba(255, 255, 255, 1);
     border-radius: 2px;
@@ -84,7 +79,7 @@ export const Select = styled.select`
 export const Submit = styled.input.attrs({
     type: 'submit',
 })`
-    ${FrederickaFont}
+    ${DefaultFont}
     color: rgba(51, 51, 51, 1);
     background: rgba(255, 255, 255, 1);
     border-radius: 2px;
@@ -107,7 +102,7 @@ export const Submit = styled.input.attrs({
 `
 
 export const Button = styled.button`
-    ${FrederickaFont}
+    ${DefaultFont}
     color: rgba(51, 51, 51, 1);
     background: rgba(255, 255, 255, 1);
     border-radius: 2px;
