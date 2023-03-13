@@ -18,7 +18,7 @@ const Wrap = styled.div`
 `
 
 const Descript: React.FC<DescriptProps> = ({ contract }) => {
-    const [name, setName] = useState<any>();
+    const [name, setName] = useState<string>('NFT Template');
     useEffect(() => {
         (async () => {
             if (contract) {
