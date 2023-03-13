@@ -12,7 +12,7 @@ const Container = styled.div`
     display: flex;
     flex-direction: row;
 
-    @media (max-width: 576px) {
+    @media (max-width: 768px) {
         flex-direction: column;
     }
 `
@@ -54,7 +54,7 @@ const NavItem = styled.a`
 
 const Content = styled.div`
    margin-top: 176px;
-   @media (max-width: 576px) {
+   @media (max-width: 768px) {
         margin-top: 192px;
         margin: 192px 16px 24px 16px;
     }
@@ -65,7 +65,7 @@ const RightNav = styled(Container)`
     align-items: center;
     order: 1;
     gap: 24px;
-    @media (max-width: 576px) {
+    @media (max-width: 768px) {
         flex-direction: row;
         margin-top: 24px;
     }

@@ -9,7 +9,7 @@ import { Web3Provider } from '../src/hooks/useWeb3'
 const GlobalStyle = createGlobalStyle`
 body {
     font-family: 'Inter', sans-serif;
-	background:#F5F5F5;
+	background:#FFFFFF;
 }
 
 a {

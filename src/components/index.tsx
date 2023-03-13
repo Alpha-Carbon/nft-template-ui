@@ -8,7 +8,9 @@ export const DefaultFont = css`
 
 export const DefaultFontSpan = styled.span`
     ${DefaultFont}
-    color: rgba(255, 255, 255, 1);
+    font-weight: 400;
+    font-size: 14px;
+    color: #BFBFBF;
 `
 
 export const EtherSymbol = () => <DefaultFontSpan>Ξ</DefaultFontSpan>
@@ -22,7 +24,7 @@ export const SubTitle = styled.h3`
 
 export const Field = styled.p`
     ${DefaultFont}
-    font-size: 20px;
+    font-size: 16px;
     opacity: 1;
 `
 
@@ -103,24 +105,25 @@ export const Submit = styled.input.attrs({
 
 export const Button = styled.button`
     ${DefaultFont}
-    color: rgba(51, 51, 51, 1);
-    background: rgba(255, 255, 255, 1);
+    color: #FFFFFF;
+    background: #2B396A;
     border-radius: 2px;
     border-width: 0px;
     outline: none;
     transition: 0.15s;
     text-align: center;
-
-    height: 2.1rem;
+    border-radius: 52px;
     min-width: 6em;
     margin: 2px;
+    padding: 14px 16px;
+    cursor: pointer;
 
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 
     &:active {
-        background-color: #f1ac15;
+        opacity: 0.6;
     }
 `
 
