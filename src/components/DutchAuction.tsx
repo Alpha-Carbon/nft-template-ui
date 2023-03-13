@@ -35,7 +35,7 @@ const DutchAuction: React.FC<DutchAuctionProps> = ({
     account,
     readyToTransact,
 }) => {
-    const { forSale, price } = contractState
+    const { price } = contractState
     const [num, setNum] = useState(trySelectSale(contractState))
     const [result, setResult] = useState<Result>()
     const [asset, setAsset] = useState<AssetMetadata[] | null>()
@@ -60,8 +60,8 @@ const DutchAuction: React.FC<DutchAuctionProps> = ({
     const closeModal = () => {
         setOpen(false);
     }
-    const onSelectNum = (selection: string) => setNum(selection)
-    const handleMint = async (evt: any) => {
+    // const onSelectNum = (selection: string) => setNum(selection)
+    const handleMint = async (evt: any,forSale:any) => {
         evt.preventDefault()
         let ready = await readyToTransact()
         if (!ready || !contract) return
@@ -159,7 +159,7 @@ const DutchAuction: React.FC<DutchAuctionProps> = ({
                 </Selection>
                 <Selection>
                     <Button onClick={(e) => {
-                        handleMintAll(e, forSale);
+                        // handleMintAll(e, forSale);
                     }}>Mint All</Button>
                 </Selection>
             </form>
