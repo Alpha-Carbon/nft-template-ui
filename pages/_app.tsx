@@ -8,11 +8,12 @@ import { Web3Provider } from '../src/hooks/useWeb3'
 
 const GlobalStyle = createGlobalStyle`
 body {
-	background: rgba(51,51,51,1);
+    font-family: 'Inter', sans-serif;
+	background:#FFFFFF;
 }
 
 a {
-    color: rgba(248,255,166,0.8);
+    color: #222222;
 }
 
 #__next {

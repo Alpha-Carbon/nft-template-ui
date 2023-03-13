@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { formatEther } from '@ethersproject/units'
 
 import { ContractState } from '../utils/contract'
-import { PangolinFont, Field, Value, EtherSymbol } from '../components'
+import { DefaultFont, Field, Value, EtherSymbol } from '../components'
 
 const Set = styled.div`
     display: inline-block;
@@ -12,7 +12,7 @@ const Set = styled.div`
 `
 
 const Num = styled.span`
-    ${PangolinFont}
+    ${DefaultFont}
     vertical-align: top;
     margin-right: 20px;
 
@@ -42,28 +42,22 @@ interface DutchAuctionProps {
 }
 
 const AuctionItem: React.FC<DutchAuctionProps> = ({
-    contractState: { auctionStarted, price, forSale },
+    contractState: { price },
     onSelect,
 }) => {
-    const endTime = moment
-        .unix(auctionStarted.toNumber())
-        .add(moment.duration(1, 'hour')) //#HACK we can query this as a setting
-    const minutesLeft = Math.max(0, endTime.diff(moment(), 'minute'))
-
-    const batch = forSale.map((x) => {
-        const num = x.toString()
-        return (
-            <React.Fragment key={`auctionItem${num}`}>
-                <Num onClick={() => onSelect(num)}>{num}</Num>{' '}
-            </React.Fragment>
-        )
-    })
+    // const batch = forSale.map((x) => {
+    //     const num = x.toString()
+    //     return (
+    //         <React.Fragment key={`auctionItem${num}`}>
+    //             <Num onClick={() => onSelect(num)}>{num}</Num>{' '}
+    //         </React.Fragment>
+    //     )
+    // })
 
     return (
         <div>
             <Set>
                 <Field>Time Left:</Field>
-                <Value>{minutesLeft} minute(s)</Value>
             </Set>
             <Set>
                 <Field>Price:</Field>
@@ -73,7 +67,7 @@ const AuctionItem: React.FC<DutchAuctionProps> = ({
             </Set>
 
             <Field>For Sale:</Field>
-            {batch}
+            {/* {batch} */}
         </div>
     )
 }

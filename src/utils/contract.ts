@@ -1,33 +1,30 @@
 import { ethers, BigNumber } from 'ethers'
 
 export interface ContractState {
-    auctionStarted: BigNumber
+    // auctionStarted: BigNumber
     price: BigNumber
-    forSale: BigNumber[]
+    total?: BigNumber
+    // forSale: BigNumber[]
 }
 
 export async function getContractState(
     contract: ethers.Contract
 ): Promise<ContractState> {
-    // console.log('querying contract...')
-    const [auctionStarted, price, forSale] = await Promise.all([
-        contract.auctionStarted(),
+    console.log('querying contract...',contract)
+    const [price] = await Promise.all([
         contract.currentPrice(),
-        contract.getForSale(),
+        // contract.getForSale(),
     ])
-
     return {
-        auctionStarted,
         price,
-        forSale,
+        // forSale,
     }
 }
 
 export async function updatePrice(
     contract: ethers.Contract
-): Promise<[BigNumber, BigNumber]> {
+): Promise<[BigNumber]> {
     return await Promise.all([
-        contract.auctionStarted(),
         contract.currentPrice(),
     ])
 }

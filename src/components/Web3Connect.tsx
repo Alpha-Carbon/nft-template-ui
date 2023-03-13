@@ -9,6 +9,21 @@ const P = styled.p`
     padding: 10px;
 `
 
+const Status = styled.button`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border: 1px solid #FFFFFF;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 700;
+    background: none;
+    outline: none;
+    border-radius: 20px;
+    cursor: pointer;
+`
+
 const Web3Connect: React.FC = () => {
     const [{ address, network, onboard, ens }, { disconnect }] = useWeb3()
 
@@ -23,7 +38,7 @@ const Web3Connect: React.FC = () => {
         <>
             {network && network === RINKEBY ? <P>(Rinkeby)</P> : null}
 
-            <Button
+            <Status
                 disabled={isConnected}
                 key="connect"
                 onClick={async () => {
@@ -32,16 +47,16 @@ const Web3Connect: React.FC = () => {
                 }}
             >
                 {buttonContent}
-            </Button>
+            </Status>
             {isConnected && (
-                <Button
+                <Status
                     key="disconnect"
                     onClick={async () => {
                         disconnect()
                     }}
                 >
                     Disconnect
-                </Button>
+                </Status>
             )}
         </>
     )

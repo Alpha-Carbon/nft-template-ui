@@ -5,9 +5,9 @@ import React, {
     useRef,
     Dispatch,
     SetStateAction,
-} from 'react'
-import { ethers, providers } from 'ethers'
-import { API, Wallet, Ens } from 'bnc-onboard/dist/src/interfaces'
+} from "react";
+import { ethers, providers } from "ethers";
+import { API, Wallet, Ens } from "bnc-onboard/dist/src/interfaces";
 
 import { ContractState, getContractState, updatePrice } from '../utils/contract'
 import { initOnboard } from '../utils/initOnboard'
@@ -15,56 +15,58 @@ import Abi from '../abi/NftTemplateAbi.json'
 import Config, { GETH_DEV } from '../config'
 
 interface ContextData {
-    address?: string
-    ens?: Ens
-    network?: number
-    balance?: string
-    wallet?: Wallet
-    onboard?: API
-    contractState?: ContractState
-    contract?: ethers.Contract
-    defaultContract: ethers.Contract
+    address?: string;
+    ens?: Ens;
+    network?: number;
+    balance?: string;
+    wallet?: Wallet;
+    onboard?: API;
+    contractState?: ContractState;
+    contract?: ethers.Contract;
+    defaultContract: ethers.Contract;
 }
 
 interface ContextActions {
-    ready: () => Promise<boolean> // function as property declaration
-    disconnect: () => void
+    ready: () => Promise<boolean>; // function as property declaration
+    disconnect: () => void;
 }
 
-type Context = [ContextData, ContextActions]
+type Context = [ContextData, ContextActions];
 
-let defaultProvider: providers.JsonRpcProvider = new providers.InfuraProvider(1)
+let defaultProvider: providers.JsonRpcProvider = new providers.InfuraProvider(
+    1
+);
 let defaultContract = new ethers.Contract(
     Config(1).contractAddress!,
     Abi,
     defaultProvider
-)
-let provider: providers.JsonRpcProvider | undefined
+);
+let provider: providers.JsonRpcProvider | undefined;
 const Web3Context = React.createContext<Context>([
     { defaultContract },
     {
         ready: async () => {
-            return false
+            return false;
         },
         disconnect: () => { },
     },
-])
+]);
 export const Web3Provider: React.FC<{}> = ({ children }) => {
-    const [address, setAddress] = useState<string>()
-    const [ens, setEns] = useState<Ens>()
-    const [network, setNetwork] = useState<number>()
-    const [balance, setBalance] = useState<string>()
-    const [wallet, setWallet] = useState<Wallet>()
-    const [onboard, setOnboard] = useState<API>()
-    const [contractState, setContractState] = useState<ContractState>()
-    const [activeContract, setActiveContract] = useState<ethers.Contract>()
+    const [address, setAddress] = useState<string>();
+    const [ens, setEns] = useState<Ens>();
+    const [network, setNetwork] = useState<number>();
+    const [balance, setBalance] = useState<string>();
+    const [wallet, setWallet] = useState<Wallet>();
+    const [onboard, setOnboard] = useState<API>();
+    const [contractState, setContractState] = useState<ContractState>();
+    const [activeContract, setActiveContract] = useState<ethers.Contract>();
 
     //callback anchors
-    const contractStateRef = useRef<ContractState>()
-    contractStateRef.current = contractState
+    const contractStateRef = useRef<ContractState>();
+    contractStateRef.current = contractState;
     const getCurrentState = () => {
-        return contractStateRef.current
-    }
+        return contractStateRef.current;
+    };
 
     useEffect(() => {
         const onboard = initOnboard({
@@ -75,24 +77,22 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
             wallet: (wallet: Wallet) => {
                 // console.log('wallet set')
                 if (wallet.provider) {
-                    setWallet(wallet)
+                    setWallet(wallet);
 
-                    provider = new ethers.providers.Web3Provider(
-                        wallet.provider
-                    )
+                    provider = new ethers.providers.Web3Provider(wallet.provider);
 
-                    window.localStorage.setItem('selectedWallet', wallet.name!)
+                    window.localStorage.setItem("selectedWallet", wallet.name!);
                 } else {
-                    provider = undefined
-                    setActiveContract(undefined)
-                    setWallet(undefined)
+                    provider = undefined;
+                    setActiveContract(undefined);
+                    setWallet(undefined);
                 }
             },
-        })
-        setOnboard(onboard)
+        });
+        setOnboard(onboard);
 
         // Get contract data and setup listeners on default contract
-        subscribeRefresh(defaultContract, setContractState)
+        subscribeRefresh(defaultContract, setContractState);
 
         // Setup price refresh on defaultProvider
         subscribeState(
@@ -100,42 +100,44 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
             defaultContract,
             getCurrentState,
             setContractState
-        )
-    }, [])
+        );
+    }, []);
 
     useEffect(() => {
-        const previouslySelectedWallet = window.localStorage.getItem(
-            'selectedWallet'
-        )
+        const previouslySelectedWallet =
+            window.localStorage.getItem("selectedWallet");
         if (previouslySelectedWallet && onboard) {
-            ; (async () => {
-                await onboard.walletSelect(previouslySelectedWallet)
-                await onboard.walletCheck()
-            })()
+            (async () => {
+                await onboard.walletSelect(previouslySelectedWallet);
+                await onboard.walletCheck();
+            })();
         }
-    }, [onboard])
+    }, [onboard]);
 
     useEffect(() => {
-        ; (async () => {
-            console.log('network changed: ', network)
-            if (!network || !onboard) return
+        (async () => {
+            console.log("network changed: ", network);
+            if (!network || !onboard) return;
 
-            onboard.config({ networkId: network })
-            defaultContract.removeAllListeners()
-            defaultProvider.removeAllListeners()
+            onboard.config({ networkId: network });
+            defaultContract.removeAllListeners();
+            defaultProvider.removeAllListeners();
             if (network == GETH_DEV) {
-                defaultProvider = new providers.JsonRpcProvider("http://192.168.50.147:8545", network)
+                defaultProvider = new providers.JsonRpcProvider(
+                    "http://192.168.50.147:8545",
+                    network
+                );
             } else {
-                defaultProvider = new providers.InfuraProvider(network)
+                defaultProvider = new providers.InfuraProvider(network);
             }
             defaultContract = new ethers.Contract(
                 Config(network).contractAddress!,
                 Abi,
                 defaultProvider
-            )
+            );
 
             // Get contract data and setup listeners on default contract
-            subscribeRefresh(defaultContract, setContractState)
+            subscribeRefresh(defaultContract, setContractState);
 
             // Setup price refresh on defaultProvider
             subscribeState(
@@ -143,12 +145,12 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
                 defaultContract,
                 getCurrentState,
                 setContractState
-            )
+            );
 
             if (wallet) {
                 let p: providers.JsonRpcProvider = new ethers.providers.Web3Provider(
                     wallet.provider
-                )
+                );
                 // console.log('resetting contract', provider.getSigner())
                 // console.log('wallet provider', wallet!.provider)
                 // console.log('wallet signer', wallet!.provider.getSigner)
@@ -156,38 +158,38 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
                     Config(network).contractAddress!,
                     Abi,
                     p.getSigner()
-                )
+                );
                 // console.log(activeContract)
-                setActiveContract(activeContract)
+                setActiveContract(activeContract);
             }
-            setNetwork(network)
-        })()
-    }, [onboard, network, wallet])
+            setNetwork(network);
+        })();
+    }, [onboard, network, wallet]);
 
     // console.log(wallet?.provider)
 
     async function readyToTransact() {
         if (!provider) {
             //#HACK if provider is set, onboard should be set.
-            const walletSelected = await onboard!.walletSelect()
-            if (!walletSelected) return false
+            const walletSelected = await onboard!.walletSelect();
+            if (!walletSelected) return false;
         }
 
-        return await onboard!.walletCheck()
+        return await onboard!.walletCheck();
     }
 
     const disconnectWallet = () => {
         if (onboard) {
             try {
-                onboard.walletReset()
+                onboard.walletReset();
             } catch (e) {
-                console.error(e)
+                console.error(e);
             }
-            setBalance(undefined)
-            setAddress(undefined)
-            window.localStorage.removeItem('selectedWallet')
+            setBalance(undefined);
+            setAddress(undefined);
+            window.localStorage.removeItem("selectedWallet");
         }
-    }
+    };
 
     return (
         <Web3Context.Provider
@@ -208,19 +210,19 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
         >
             {children}
         </Web3Context.Provider>
-    )
-}
+    );
+};
 
 async function subscribeRefresh(
     contract: ethers.Contract,
     setContractState: Dispatch<SetStateAction<ContractState | undefined>>
 ) {
-    const contractState = await getContractState(defaultContract)
-    contract.on('Refresh', async () => {
-        let currentState = await getContractState(defaultContract)
-        setContractState(currentState)
-    })
-    setContractState(contractState)
+    const contractState = await getContractState(defaultContract);
+    contract.on("Refresh", async () => {
+        let currentState = await getContractState(defaultContract);
+        setContractState(currentState);
+    });
+    setContractState(contractState);
 }
 
 function subscribeState(
@@ -229,35 +231,42 @@ function subscribeState(
     getCurrentState: () => ContractState | undefined,
     setContractState: Dispatch<SetStateAction<ContractState | undefined>>
 ) {
-    provider.on('block', async (_block) => {
+    provider.on("block", async (_block) => {
         try {
             // console.log(`mainnet - ${block}!`)
-            const currentState = getCurrentState()
-            const price = await contract.currentPrice()
-
-            console.log(
-                `current price ${currentState?.price}, new price ${price}`
-            )
+            const currentState = getCurrentState();
+            const price = await contract.currentPrice();
+            const total = await contract.totalSupply();
+            
+            console.log(`current price ${currentState?.price}, new price ${price}`);
 
             //#HACK, in case refresh event comes later than the last auto refresh from block updates
             //we should force update the forsale and auctionstarted (a full requery)
             if (currentState && currentState.price < price) {
-                const [auctionStarted, forSale] = await Promise.all([
-                    contract.auctionStarted(),
-                    contract.getForSale(),
-                ])
-                setContractState({ auctionStarted, forSale, price })
+                const [total] = await Promise.all([
+                    contract.totalSupply(),
+                ]);
+                setContractState({ price, total });
             } else {
                 setContractState((prev: ContractState | undefined) => {
-                    return prev ? { ...prev, price } : prev
-                })
+                    return prev ? { ...prev, price,total } : prev;
+                });
             }
         } catch (e) {
-            console.error(`contract error: ${e}`)
+            console.error(`contract error: ${e}`);
         }
-    })
+    });
+}
+
+export async function updateTransaction(hash: string) {
+    const transaction = await defaultProvider.getTransaction(hash);
+    const receipt = await defaultProvider.getTransactionReceipt(hash);
+    if (transaction.blockNumber && transaction.confirmations) {
+        defaultProvider.off(hash);
+    }
+    return { receipt, transaction };
 }
 
 export default function useWeb3() {
-    return useContext(Web3Context)
+    return useContext(Web3Context);
 }

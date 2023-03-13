@@ -1,38 +1,35 @@
 import styled, { css } from 'styled-components'
 
-export const PangolinFont = css`
-    color: rgba(255, 255, 255, 1);
-    font-family: Pangolin;
-    font-weight: Regular;
-`
-
-export const FrederickaFont = css`
-    color: rgba(255, 255, 255, 1);
-    font-family: Fredericka the Great;
-    font-weight: Regular;
-`
-
 export const DefaultFont = css`
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
         Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol';
 `
 
 export const DefaultFontSpan = styled.span`
     ${DefaultFont}
-    color: rgba(255, 255, 255, 1);
+    font-weight: 400;
+    font-size: 14px;
+    color: #BFBFBF;
 `
 
 export const EtherSymbol = () => <DefaultFontSpan>Ξ</DefaultFontSpan>
 
+export const SubTitle = styled.h3`
+    ${DefaultFont}
+    font-weight: 700;
+    font-size: 24px;
+    color: #222222;
+`
+
 export const Field = styled.p`
-    ${PangolinFont}
-    font-size: 20px;
+    ${DefaultFont}
+    font-size: 16px;
     opacity: 1;
 `
 
 export const Value = styled.p`
-    ${PangolinFont}
+    ${DefaultFont}
     color: rgba(166, 250, 255, 1);
     font-size: 26px;
     opacity: 1;
@@ -46,7 +43,7 @@ export const FieldSet = styled.fieldset`
 `
 
 export const Input = styled.input`
-    ${PangolinFont}
+    ${DefaultFont}
     font-size: inherit;
     padding: 0.3em 0.4em;
     margin: 0.1em 0.2em;
@@ -59,7 +56,7 @@ export const Input = styled.input`
 `
 
 export const Select = styled.select`
-    ${FrederickaFont}
+    ${DefaultFont}
     color: rgba(51, 51, 51, 1);
     background: rgba(255, 255, 255, 1);
     border-radius: 2px;
@@ -84,7 +81,7 @@ export const Select = styled.select`
 export const Submit = styled.input.attrs({
     type: 'submit',
 })`
-    ${FrederickaFont}
+    ${DefaultFont}
     color: rgba(51, 51, 51, 1);
     background: rgba(255, 255, 255, 1);
     border-radius: 2px;
@@ -107,25 +104,26 @@ export const Submit = styled.input.attrs({
 `
 
 export const Button = styled.button`
-    ${FrederickaFont}
-    color: rgba(51, 51, 51, 1);
-    background: rgba(255, 255, 255, 1);
+    ${DefaultFont}
+    color: #FFFFFF;
+    background: ${(props)=> props.color || '#2B396A'};
     border-radius: 2px;
     border-width: 0px;
     outline: none;
     transition: 0.15s;
     text-align: center;
-
-    height: 2.1rem;
+    border-radius: 52px;
     min-width: 6em;
     margin: 2px;
+    padding: 14px 16px;
+    cursor: pointer;
 
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 
     &:active {
-        background-color: #f1ac15;
+        opacity: 0.6;
     }
 `
 
