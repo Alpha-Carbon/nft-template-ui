@@ -1,6 +1,10 @@
+import { ethers } from 'ethers'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { AssetMetadata } from '../utils/decoding'
-import { Processing } from './Processing'
+import { ContractState } from '../utils/contract'
+import { AssetMetadata, decodeRendererV1 } from '../utils/decoding'
+import Modal from './Modal'
+import { Button } from '.'
 
 const ImageWrap = styled.div`
     display: flex;
@@ -48,18 +52,110 @@ const Burn = styled.button`
     padding: 2px 14px;
 `
 
+const Buttons = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+`
+
 interface Props {
-    metadata?: AssetMetadata
+    metadata?: AssetMetadata;
+    account?: string | null
+    contract?: ethers.Contract
+    contractState: ContractState
+    readyToTransact: () => Promise<boolean>
 }
 
-const OwnerAssets: React.FC<Props> = ({ metadata }) => {
+const OwnerAssets: React.FC<Props> = ({
+    metadata,
+    contract,
+    contractState,
+    account,
+    readyToTransact,
+}) => {
+    const [assets, setAsset] = useState<AssetMetadata[] | null>();
+    const [open, setOpen] = useState<boolean>(false);
+    const [tokenId, setTokenId] = useState<number>();
+
+    const getNft = async() => {
+        if (contract) {
+            const balanceOf = await contract.balanceOf(account);
+            const nftArr = [];
+            if (balanceOf.toNumber() === 0) {
+                setAsset(null);
+                return;
+            } else {
+                try {
+                    for (let i = 0; i < balanceOf.toNumber(); i++) {
+                        const owner = await contract.tokenOfOwnerByIndex(account, i);
+                        console.log('owner',owner);
+                        let newNft = await contract.tokenURI(owner);
+                        newNft = decodeRendererV1(newNft);
+                        nftArr.push(newNft)
+                        setAsset(nftArr);
+                    }
+                } catch (e) {
+                    console.log('e', e);
+                }
+            }
+        }
+    }
+
+    useEffect(() => {
+        (async () => {
+            getNft();
+        })()
+    }, [account])
+
+    const closeModal = () => {
+        setOpen(false);
+    }
+
+    const openModal = (id: number) => {
+        setOpen(true);
+        setTokenId(id);
+    }
+
+    const handleBurn = async (evt: any) => {
+        evt.preventDefault()
+        let ready = await readyToTransact()
+        if (!ready || !contract) return
+
+        try {
+            const res = await contract.burn(tokenId).then((res: any) => {
+                closeModal();
+                getNft();
+            })
+            console.log('burn result:', res.toString())
+        } catch (e) {
+            console.log(`tx response: ${e}`)
+        }
+    }
+
     return (
         <ImageWrap>
-            <ImageContainer>
-                <img src={metadata?.image} />
-                <p>123432</p>
-                <Burn>Burn</Burn>
-            </ImageContainer>
+            {assets ? assets.map((asset) => {
+                return (
+                    <ImageContainer key={asset.image}>
+                        <img src={asset.image} />
+                        <p>{asset.name}</p>
+                        <Burn onClick={(e) => {
+                            openModal(Number(asset.name))
+                        }}>Burn</Burn>
+                    </ImageContainer>
+                )
+            }) :
+                <h3>No Assets</h3>
+            }
+            <Modal isOpen={open} onClose={closeModal}>
+                <h3>Confirm Burn</h3>
+                <p>Burn token {tokenId}</p>
+                <Buttons>
+                    <Button onClick={closeModal} color="#ACACAC" >Cancel</Button>
+                    <Button onClick={handleBurn}>Burn</Button>
+                </Buttons>
+            </Modal>
         </ImageWrap>
     )
 }

@@ -106,7 +106,7 @@ export const Submit = styled.input.attrs({
 export const Button = styled.button`
     ${DefaultFont}
     color: #FFFFFF;
-    background: #2B396A;
+    background: ${(props)=> props.color || '#2B396A'};
     border-radius: 2px;
     border-width: 0px;
     outline: none;

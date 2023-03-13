@@ -1,5 +1,11 @@
+import { ethers } from "ethers";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { SubTitle, Field } from ".";
+
+interface DescriptProps {
+    contract?: ethers.Contract
+}
 
 const Wrap = styled.div`
     &>h3 {
@@ -11,15 +17,24 @@ const Wrap = styled.div`
     }
 `
 
-const Descript: React.FC = () => {
+const Descript: React.FC<DescriptProps> = ({ contract }) => {
+    const [name, setName] = useState<any>();
+    useEffect(() => {
+        (async () => {
+            if (contract) {
+                const name = await contract.name().then((res: any) => {
+                    setName(res)
+                })
+            }
+        })()
+    }, [])
     return (
         <Wrap>
             <SubTitle>
-                NFT_NAME
+                {name}
             </SubTitle>
             <Field>
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type.
-            </Field>
+                {name} is a showcase of ERC-721. Support simple operation such as mint, burn. There are four shapes of NFT can be minted right now: circle, cross, square and triangle. </Field>
         </Wrap>
 
     )

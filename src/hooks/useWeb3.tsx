@@ -236,19 +236,20 @@ function subscribeState(
             // console.log(`mainnet - ${block}!`)
             const currentState = getCurrentState();
             const price = await contract.currentPrice();
-
+            const total = await contract.totalSupply();
+            
             console.log(`current price ${currentState?.price}, new price ${price}`);
 
             //#HACK, in case refresh event comes later than the last auto refresh from block updates
             //we should force update the forsale and auctionstarted (a full requery)
             if (currentState && currentState.price < price) {
-                // const [forSale] = await Promise.all([
-                //     contract.getForSale(),
-                // ]);
-                setContractState({ price });
+                const [total] = await Promise.all([
+                    contract.totalSupply(),
+                ]);
+                setContractState({ price, total });
             } else {
                 setContractState((prev: ContractState | undefined) => {
-                    return prev ? { ...prev, price } : prev;
+                    return prev ? { ...prev, price,total } : prev;
                 });
             }
         } catch (e) {

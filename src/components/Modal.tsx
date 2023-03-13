@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
-
+import ClearSVG from './Clear';
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -37,6 +37,8 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
 `;
 
 const ModalWrapper = styled.div`
+  width:80%;
+  max-width: 640px;
   position: fixed;
   top: 50%;
   left: 50%;
@@ -48,6 +50,13 @@ const ModalWrapper = styled.div`
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   animation: ${fadeIn} 0.3s ease-in-out;
 `;
+
+const Close = styled.div`
+  cursor: pointer;
+  position: absolute;
+  right: 24px;
+  top: 24px;
+`
 
 const ModalContent = styled.div``;
 
@@ -75,6 +84,9 @@ const Modal = ({ isOpen, onClose, children }: React.PropsWithChildren<ModalProps
   return (
     <ModalOverlay isOpen={isOpen} onClick={handleOutsideClick}>
       <ModalWrapper>
+        <Close onClick={()=>{
+          onClose();
+        }}><ClearSVG /></Close>
         <ModalContent>{children}</ModalContent>
       </ModalWrapper>
     </ModalOverlay>

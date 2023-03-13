@@ -3,14 +3,10 @@ import type { Page } from '../src/types/PageComponent'
 import styled from 'styled-components'
 import Head from 'next/head'
 // import { useRouter } from 'next/router'
-
 import Layout from '../src/components/Layout'
-import OwnerCheck from '../src/components/OwnerCheck'
-import DutchAuction from '../src/components/DutchAuction'
-import Operations from '../src/components/Operations'
 import useWeb3 from '../src/hooks/useWeb3'
 import Descript from '../src/components/Descript'
-import Percentage from '../src/components/Percentage'
+import Mint from '../src/components/Mint'
 import OwnerAssets from '../src/components/AssetRender'
 
 const Home: Page = () => {
@@ -33,14 +29,21 @@ const Home: Page = () => {
 
                 {contractState && (
                     <div>
-                        <Descript />
-                        <Percentage 
+                        <Descript 
+                            contract={contract}
+                        />
+                        <Mint
                             contractState={contractState}
                             contract={contract}
                             account={address}
                             readyToTransact={actions.ready}
                         />
-                        <OwnerAssets />
+                        <OwnerAssets
+                            contractState={contractState}
+                            contract={contract}
+                            account={address}
+                            readyToTransact={actions.ready}
+                        />
                     </div>
                 )}
             </Main>

@@ -3,6 +3,7 @@ import { ethers, BigNumber } from 'ethers'
 export interface ContractState {
     // auctionStarted: BigNumber
     price: BigNumber
+    total?: BigNumber
     // forSale: BigNumber[]
 }
 
