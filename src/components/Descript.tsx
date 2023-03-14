@@ -1,10 +1,9 @@
 import { ethers } from "ethers";
-import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { SubTitle, Field } from ".";
 
 interface DescriptProps {
-    contract?: ethers.Contract
+    name?: string
 }
 
 const Wrap = styled.div`
@@ -17,24 +16,14 @@ const Wrap = styled.div`
     }
 `
 
-const Descript: React.FC<DescriptProps> = ({ contract }) => {
-    const [name, setName] = useState<string>('NFT Template');
-    useEffect(() => {
-        (async () => {
-            if (contract) {
-                const name = await contract.name().then((res: any) => {
-                    setName(res)
-                })
-            }
-        })()
-    }, [])
+const Descript: React.FC<DescriptProps> = ({ name }) => {
     return (
         <Wrap>
             <SubTitle>
-                {name}
+                {name ? name : 'NFT Template'}
             </SubTitle>
             <Field>
-                {name} is a showcase of ERC-721. Support simple operation such as mint, burn. There are four shapes of NFT can be minted right now: circle, cross, square and triangle. </Field>
+                {name ? name : 'NFT Template'} is a showcase of ERC-721. Support simple operation such as mint, burn. There are four shapes of NFT can be minted right now: circle, cross, square and triangle. </Field>
         </Wrap>
 
     )

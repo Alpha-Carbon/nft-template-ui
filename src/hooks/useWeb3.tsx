@@ -13,6 +13,7 @@ import { ContractState, getContractState, updatePrice } from '../utils/contract'
 import { initOnboard } from '../utils/initOnboard'
 import Abi from '../abi/NftTemplateAbi.json'
 import Config, { GETH_DEV, AMINOX_TESTNET, supportedChains } from '../config'
+import delay from "../utils/delay";
 
 interface ContextData {
     address?: string;
@@ -232,7 +233,7 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
                     contractState,
                     contract: activeContract,
                     defaultContract,
-                    provider:defaultProvider
+                    provider: defaultProvider
                 },
                 { ready: readyToTransact, disconnect: disconnectWallet },
             ]}
@@ -263,10 +264,12 @@ async function subscribeState(
     try {
         // console.log(`mainnet - ${block}!`)
         const currentState = getCurrentState();
+        await delay(1000);
         const price = await contract.currentPrice();
         const total = await contract.totalSupply();
-        console.log('total', total);
-        console.log(`current price ${currentState?.price}, new price ${price}`);
+        const name = await contract.name();
+
+        // console.log(`current price ${currentState?.price}, new price ${price}`);
 
         //#HACK, in case refresh event comes later than the last auto refresh from block updates
         //we should force update the forsale and auctionstarted (a full requery)
@@ -277,7 +280,7 @@ async function subscribeState(
             setContractState({ price, total });
         } else {
             setContractState((prev: ContractState | undefined) => {
-                return prev ? { ...prev, price, total } : prev;
+                return prev ? { ...prev, price, total, name } : prev;
             });
         }
     } catch (e) {

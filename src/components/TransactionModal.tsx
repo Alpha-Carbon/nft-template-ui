@@ -15,6 +15,7 @@ interface TransactionModalProps {
     | Partial<ContractTransaction>
     | any;
     receipt: undefined | null | Record<string, never> | Partial<ContractReceipt>
+    name: string | undefined;
 
 }
 
@@ -57,6 +58,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     closeModal,
     transaction,
     receipt,
+    name,
 }) => {
     // console.log(transaction,'modal transaction');
     // console.log(receipt,'modal receipt');
@@ -81,7 +83,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
             <Modal isOpen={isOpen} onClose={closeModal}>
                 <Loading><Processing /></Loading>
                 <ModalTitle>Your Mint Is Processing</ModalTitle>
-                <ModalText>Your mint of NFT_NAME is processing</ModalText>
+                <ModalText>Your mint of {name} is processing</ModalText>
             </Modal>
         )
     }

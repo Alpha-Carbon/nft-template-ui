@@ -94,7 +94,6 @@ const OwnerAssets: React.FC<Props> = ({
                 try {
                     for (let i = 0; i < balanceOf.toNumber(); i++) {
                         const owner = await contract.tokenOfOwnerByIndex(account, i);
-                        console.log('owner', owner);
                         let newNft = await contract.tokenURI(owner);
                         newNft = decodeRendererV1(newNft);
                         nftArr.push(newNft)
@@ -126,11 +125,22 @@ const OwnerAssets: React.FC<Props> = ({
         evt.preventDefault()
         let ready = await readyToTransact()
         if (!ready || !contract) return
-
+        console.log('provider', provider);
         try {
-            const res = await contract.burn(tokenId).then((res: any) => {
+            const res = await contract.burn(tokenId).then(async (b: any) => {
                 closeModal();
-                getNft();
+                if (provider) {
+                    provider.on(b.hash, async () => {
+                        await updateTransaction(b.hash).then((tx) => {
+                            console.log('burn tx', tx);
+                            if (tx.receipt) {
+                                provider.off(b.hash)
+                                getNft();
+                            }
+                        })
+                    })
+                }
+
             })
             // console.log('burn result:', res);
         } catch (e) {

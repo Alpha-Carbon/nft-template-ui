@@ -30,7 +30,7 @@ const Home: Page = () => {
                 {contractState && (
                     <div>
                         <Descript 
-                            contract={contract}
+                            name={contractState?.name}
                         />
                         <Mint
                             contractState={contractState}
@@ -44,6 +44,7 @@ const Home: Page = () => {
                             contract={contract}
                             account={address}
                             readyToTransact={actions.ready}
+                            provider={provider}
                         />
                     </div>
                 )}

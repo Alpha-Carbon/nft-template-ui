@@ -100,7 +100,7 @@ const Mint: React.FC<MintedProps> = ({
     readyToTransact,
     provider,
 }) => {
-    const { price, total } = contractState;
+    const { price, total, name } = contractState;
     const [num, setNum] = useState<number>(1);
     const [result, setResult] = useState<Result | null>();
     const [isOpen, setOpen] = useState<boolean>(false);
@@ -168,7 +168,7 @@ const Mint: React.FC<MintedProps> = ({
                 <Process width={`calc(100% * (${total ? total.toNumber() : 0} / 1000))`} />
             </ProcessBar>
             <MintedWrap>
-                <Price>{formatEther(price)} <p>ETH</p></Price>
+                <Price>{formatEther(price)} <p>TACT</p></Price>
                 <BuyWrap>
                     {/* <BuyNum>
                         <button onClick={() => {
@@ -187,6 +187,7 @@ const Mint: React.FC<MintedProps> = ({
                 closeModal={closeModal}
                 receipt={receipt}
                 transaction={transaction}
+                name={name}
             />
         </Wrap>
     )
