@@ -12,7 +12,7 @@ import { API, Wallet, Ens } from "bnc-onboard/dist/src/interfaces";
 import { ContractState, getContractState, updatePrice } from '../utils/contract'
 import { initOnboard } from '../utils/initOnboard'
 import Abi from '../abi/NftTemplateAbi.json'
-import Config, { GETH_DEV } from '../config'
+import Config, { GETH_DEV, AMINOX_TESTNET, supportedChains } from '../config'
 
 interface ContextData {
     address?: string;
@@ -33,11 +33,20 @@ interface ContextActions {
 
 type Context = [ContextData, ContextActions];
 
-let defaultProvider: providers.JsonRpcProvider = new providers.InfuraProvider(
-    1
+// let defaultProvider: providers.JsonRpcProvider = new providers.InfuraProvider(
+//     1
+// );
+let defaultProvider: providers.JsonRpcProvider = new providers.JsonRpcProvider(
+    "https://aminoxtestnet.node.alphacarbon.network/",
+    AMINOX_TESTNET,
 );
+// let defaultContract = new ethers.Contract(
+//     Config(1).contractAddress!,
+//     Abi,
+//     defaultProvider
+// );
 let defaultContract = new ethers.Contract(
-    Config(1).contractAddress!,
+    Config(AMINOX_TESTNET).contractAddress!,
     Abi,
     defaultProvider
 );
@@ -119,17 +128,35 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
             console.log("network changed: ", network);
             if (!network || !onboard) return;
 
+            if (!supportedChains.includes(network)) {
+                setActiveContract(undefined)
+                return
+            }
+
             onboard.config({ networkId: network });
             defaultContract.removeAllListeners();
             defaultProvider.removeAllListeners();
-            if (network == GETH_DEV) {
-                defaultProvider = new providers.JsonRpcProvider(
-                    "http://192.168.50.147:8545",
-                    network
-                );
-            } else {
-                defaultProvider = new providers.InfuraProvider(network);
-            }
+            // if (network == GETH_DEV) {
+            //     defaultProvider = new providers.JsonRpcProvider(
+            //         "http://192.168.50.147:8545",
+            //         network
+            //     );
+            // } else if (network == AMINOX_TESTNET) {
+            //     console.log('conneted aminox');
+            //     defaultProvider = new providers.JsonRpcProvider(
+            //         "https://aminoxtestnet.node.alphacarbon.network/",
+            //         network
+            //     );
+            // }
+            // else if (network == MAINNET || network == RINKEBY) {
+            //     defaultProvider = new providers.InfuraProvider(network);
+            // }
+            // else {
+            //     defaultProvider = new providers.JsonRpcProvider(
+            //         undefined,
+            //         network
+            //     );
+            // }
             defaultContract = new ethers.Contract(
                 Config(network).contractAddress!,
                 Abi,
@@ -237,8 +264,8 @@ function subscribeState(
             const currentState = getCurrentState();
             const price = await contract.currentPrice();
             const total = await contract.totalSupply();
-            
-            console.log(`current price ${currentState?.price}, new price ${price}`);
+
+            // console.log(`current price ${currentState?.price}, new price ${price}`);
 
             //#HACK, in case refresh event comes later than the last auto refresh from block updates
             //we should force update the forsale and auctionstarted (a full requery)
@@ -249,7 +276,7 @@ function subscribeState(
                 setContractState({ price, total });
             } else {
                 setContractState((prev: ContractState | undefined) => {
-                    return prev ? { ...prev, price,total } : prev;
+                    return prev ? { ...prev, price, total } : prev;
                 });
             }
         } catch (e) {

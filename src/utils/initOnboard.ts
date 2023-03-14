@@ -2,7 +2,7 @@ import Onboard from 'bnc-onboard'
 import { Subscriptions } from 'bnc-onboard/dist/src/interfaces'
 import carbonWallet from './carbonWallet'
 
-const networkId = 4
+const networkId = 13370
 const infuraId = 'de6e66cb509c43e0897d062c93f15d9e'
 const rpcUrl = `https://mainnet.infura.io/v3/${infuraId}`
 
@@ -12,7 +12,7 @@ export function initOnboard(subscriptions: Subscriptions) {
         hideBranding: true,
         networkId,
         // apiUrl,
-        darkMode: true,
+        darkMode: false,
         subscriptions,
         walletSelect: {
             wallets: [
