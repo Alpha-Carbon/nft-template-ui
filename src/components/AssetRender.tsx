@@ -103,10 +103,14 @@ const OwnerAssets: React.FC<Props> = ({
                     console.log('e', e);
                 }
             }
+        }else {
+            setAsset(null);
+            setTotal(0);
         }
     }
 
     useEffect(() => {
+        console.log('contract', contract);
         (async () => {
             getNft();
         })()
