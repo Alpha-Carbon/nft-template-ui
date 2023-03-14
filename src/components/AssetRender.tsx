@@ -1,10 +1,11 @@
-import { ethers } from 'ethers'
-import { useEffect, useState } from 'react'
+import { ethers, providers } from 'ethers'
+import { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { ContractState } from '../utils/contract'
 import { AssetMetadata, decodeRendererV1 } from '../utils/decoding'
 import Modal from './Modal'
 import { Button } from '.'
+import { updateTransaction } from '../hooks/useWeb3'
 
 const ImageWrap = styled.div`
     display: flex;
@@ -63,6 +64,7 @@ interface Props {
     metadata?: AssetMetadata;
     account?: string | null
     contract?: ethers.Contract
+    provider?: providers.JsonRpcProvider | undefined
     contractState: ContractState
     readyToTransact: () => Promise<boolean>
 }
@@ -72,15 +74,18 @@ const OwnerAssets: React.FC<Props> = ({
     contract,
     contractState,
     account,
+    provider,
     readyToTransact,
 }) => {
     const [assets, setAsset] = useState<AssetMetadata[] | null>();
     const [open, setOpen] = useState<boolean>(false);
     const [tokenId, setTokenId] = useState<number>();
+    const [total, setTotal] = useState<number>();
 
-    const getNft = async() => {
+    const getNft = async () => {
         if (contract) {
             const balanceOf = await contract.balanceOf(account);
+            setTotal(balanceOf.toNumber());
             const nftArr = [];
             if (balanceOf.toNumber() === 0) {
                 setAsset(null);
@@ -89,7 +94,7 @@ const OwnerAssets: React.FC<Props> = ({
                 try {
                     for (let i = 0; i < balanceOf.toNumber(); i++) {
                         const owner = await contract.tokenOfOwnerByIndex(account, i);
-                        console.log('owner',owner);
+                        console.log('owner', owner);
                         let newNft = await contract.tokenURI(owner);
                         newNft = decodeRendererV1(newNft);
                         nftArr.push(newNft)
@@ -127,36 +132,39 @@ const OwnerAssets: React.FC<Props> = ({
                 closeModal();
                 getNft();
             })
-            console.log('burn result:', res.toString())
+            // console.log('burn result:', res);
         } catch (e) {
             console.log(`tx response: ${e}`)
         }
     }
 
     return (
-        <ImageWrap>
-            {assets ? assets.map((asset) => {
-                return (
-                    <ImageContainer key={asset.image}>
-                        <img src={asset.image} />
-                        <p>{asset.name}</p>
-                        <Burn onClick={(e) => {
-                            openModal(Number(asset.name))
-                        }}>Burn</Burn>
-                    </ImageContainer>
-                )
-            }) :
-                <h3>No Assets</h3>
-            }
-            <Modal isOpen={open} onClose={closeModal}>
-                <h3>Confirm Burn</h3>
-                <p>Burn token {tokenId}</p>
-                <Buttons>
-                    <Button onClick={closeModal} color="#ACACAC" >Cancel</Button>
-                    <Button onClick={handleBurn}>Burn</Button>
-                </Buttons>
-            </Modal>
-        </ImageWrap>
+        <>
+            <h3>Assets {total ? `(${total})` : null}</h3>
+            <ImageWrap>
+                {assets ? assets.map((asset) => {
+                    return (
+                        <ImageContainer key={asset.image}>
+                            <img src={asset.image} />
+                            <p>{asset.name}</p>
+                            <Burn onClick={(e) => {
+                                openModal(Number(asset.name))
+                            }}>Burn</Burn>
+                        </ImageContainer>
+                    )
+                }) :
+                    <h3>No Assets</h3>
+                }
+                <Modal isOpen={open} onClose={closeModal}>
+                    <h3>Confirm Burn</h3>
+                    <p>Burn token {tokenId}</p>
+                    <Buttons>
+                        <Button onClick={closeModal} color="#ACACAC" >Cancel</Button>
+                        <Button onClick={handleBurn}>Burn</Button>
+                    </Buttons>
+                </Modal>
+            </ImageWrap>
+        </>
     )
 }
 
