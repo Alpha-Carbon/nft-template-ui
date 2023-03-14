@@ -96,11 +96,11 @@ const Layout: React.FC = ({ children }) => {
                     </Logo>
                 </Link>
                 <RightNav>
-                    <Link href={openSeaLink} passHref>
+                    {/* <Link href={openSeaLink} passHref>
                         <NavItem target="_blank" rel="noopener noreferrer">
                             OpenSea
                         </NavItem>
-                    </Link>
+                    </Link> */}
                     <Web3Connect />
                 </RightNav>
             </Navigation>

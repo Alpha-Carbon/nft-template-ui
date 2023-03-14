@@ -1,6 +1,6 @@
-# Memenumbers DApp Web UI
+# NFT Template DApp Web UI
 
-Who knows, maybe we will prove the Collatz Conjecture while we are at this.
+A demo of the [NFT Template Contract](https://github.com/Alpha-Carbon/nft-template-contract), which provides an interface for users to mint/burn their NFTs.
 
 ## Getting Started
 
