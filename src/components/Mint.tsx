@@ -1,4 +1,4 @@
-import { BigNumber, ContractReceipt, ContractTransaction, ethers } from "ethers";
+import { BigNumber, ContractReceipt, ContractTransaction, ethers, providers } from "ethers";
 import { useEffect, useState } from "react";
 import styled, { css } from "styled-components";
 import { Button } from ".";
@@ -12,6 +12,7 @@ import { Result } from "../types";
 interface MintedProps {
     account?: string | null
     contract?: ethers.Contract
+    provider?: providers.JsonRpcProvider | undefined
     contractState: ContractState
     readyToTransact: () => Promise<boolean>
 }
@@ -92,24 +93,12 @@ const BuyNum = styled.div`
     }
 `
 
-const ModalTitle = styled.h3`
-    color: #222222;
-    text-align: center;
-    font-weight:700;
-    font-size: 32px;
-`
-const ModalText = styled.p`
-    color: #222222;
-    text-align: center;
-    font-weight:400;
-    font-size: 24px;
-`
-
 const Mint: React.FC<MintedProps> = ({
     contract,
     contractState,
     account,
     readyToTransact,
+    provider,
 }) => {
     const { price, total } = contractState;
     const [num, setNum] = useState<number>(1);
@@ -150,32 +139,24 @@ const Mint: React.FC<MintedProps> = ({
         try {
             setOpen(true);
             let res = await contract!.mint(account, { value: price });
-
-            const transaction = await updateTransaction(res.hash).then(async (res) => {
-                if (res.transaction.blockNumber && res.transaction.confirmations) {
-                    console.log('show nft', res);
-                    setReceipt(res.receipt);
-                    setTransaction(res.transaction);
-                }
-            });
-            console.log('mint result:', res)
-            setResult({
-                message: `Mint Transaction Sent, Tx Hash: ${res.hash}`,
-            })
-
+            if(provider) {
+                provider.on(res.hash, async ()=>{
+                    await updateTransaction(res.hash).then(async (tx) => {
+                        console.log('res transaction', tx);
+                        setReceipt(tx.receipt);
+                        setTransaction(tx.transaction);
+                        if(tx.transaction.confirmations >= 5) {
+                            console.log('clear');
+                            provider.off(res.hash)
+                        }
+                    });
+                })
+            }
         } catch (e: any) {
             console.log(`tx response: ${e.message}`)
             setTransaction({ failed: true });
-            setResult({
-                message: `Mint Transaction Error: ${e.message}`,
-                err: e as Error,
-            })
         }
     }
-
-    useEffect(() => {
-        console.log(`result:${result}`);
-    }, [result])
 
     return (
         <Wrap>
@@ -206,7 +187,6 @@ const Mint: React.FC<MintedProps> = ({
                 closeModal={closeModal}
                 receipt={receipt}
                 transaction={transaction}
-                result={result}
             />
         </Wrap>
     )

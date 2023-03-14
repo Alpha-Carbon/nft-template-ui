@@ -6,7 +6,7 @@ import React, {
     Dispatch,
     SetStateAction,
 } from "react";
-import { ethers, providers } from "ethers";
+import { ContractReceipt, ContractTransaction, ethers, providers } from "ethers";
 import { API, Wallet, Ens } from "bnc-onboard/dist/src/interfaces";
 
 import { ContractState, getContractState, updatePrice } from '../utils/contract'
@@ -23,6 +23,7 @@ interface ContextData {
     onboard?: API;
     contractState?: ContractState;
     contract?: ethers.Contract;
+    provider?: providers.JsonRpcProvider | undefined
     defaultContract: ethers.Contract;
 }
 
@@ -108,7 +109,7 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
             defaultProvider,
             defaultContract,
             getCurrentState,
-            setContractState
+            setContractState,
         );
     }, []);
 
@@ -171,7 +172,7 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
                 defaultProvider,
                 defaultContract,
                 getCurrentState,
-                setContractState
+                setContractState,
             );
 
             if (wallet) {
@@ -231,6 +232,7 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
                     contractState,
                     contract: activeContract,
                     defaultContract,
+                    provider:defaultProvider
                 },
                 { ready: readyToTransact, disconnect: disconnectWallet },
             ]}
@@ -245,53 +247,48 @@ async function subscribeRefresh(
     setContractState: Dispatch<SetStateAction<ContractState | undefined>>
 ) {
     const contractState = await getContractState(defaultContract);
-    contract.on("Refresh", async () => {
-        let currentState = await getContractState(defaultContract);
-        setContractState(currentState);
-    });
+    // contract.on("Refresh", async () => {
+    //     let currentState = await getContractState(defaultContract);
+    //     setContractState(currentState);
+    // });
     setContractState(contractState);
 }
 
-function subscribeState(
+async function subscribeState(
     provider: providers.JsonRpcProvider,
     contract: ethers.Contract,
     getCurrentState: () => ContractState | undefined,
-    setContractState: Dispatch<SetStateAction<ContractState | undefined>>
+    setContractState: Dispatch<SetStateAction<ContractState | undefined>>,
 ) {
-    provider.on("block", async (_block) => {
-        try {
-            // console.log(`mainnet - ${block}!`)
-            const currentState = getCurrentState();
-            const price = await contract.currentPrice();
-            const total = await contract.totalSupply();
+    try {
+        // console.log(`mainnet - ${block}!`)
+        const currentState = getCurrentState();
+        const price = await contract.currentPrice();
+        const total = await contract.totalSupply();
+        console.log('total', total);
+        console.log(`current price ${currentState?.price}, new price ${price}`);
 
-            // console.log(`current price ${currentState?.price}, new price ${price}`);
-
-            //#HACK, in case refresh event comes later than the last auto refresh from block updates
-            //we should force update the forsale and auctionstarted (a full requery)
-            if (currentState && currentState.price < price) {
-                const [total] = await Promise.all([
-                    contract.totalSupply(),
-                ]);
-                setContractState({ price, total });
-            } else {
-                setContractState((prev: ContractState | undefined) => {
-                    return prev ? { ...prev, price, total } : prev;
-                });
-            }
-        } catch (e) {
-            console.error(`contract error: ${e}`);
+        //#HACK, in case refresh event comes later than the last auto refresh from block updates
+        //we should force update the forsale and auctionstarted (a full requery)
+        if (currentState && currentState.price < price) {
+            const [total] = await Promise.all([
+                contract.totalSupply(),
+            ]);
+            setContractState({ price, total });
+        } else {
+            setContractState((prev: ContractState | undefined) => {
+                return prev ? { ...prev, price, total } : prev;
+            });
         }
-    });
+    } catch (e) {
+        console.error(`contract error: ${e}`);
+    }
 }
 
 export async function updateTransaction(hash: string) {
     const transaction = await defaultProvider.getTransaction(hash);
     const receipt = await defaultProvider.getTransactionReceipt(hash);
-    if (transaction.blockNumber && transaction.confirmations) {
-        defaultProvider.off(hash);
-    }
-    return { receipt, transaction };
+    return { transaction, receipt };
 }
 
 export default function useWeb3() {

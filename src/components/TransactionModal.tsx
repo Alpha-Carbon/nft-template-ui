@@ -1,12 +1,7 @@
 import { BigNumber, ContractReceipt, ContractTransaction, ethers } from "ethers";
 import { useEffect, useState } from "react";
 import styled, { css } from "styled-components";
-import { Button } from ".";
-import { ContractState } from "../utils/contract";
-import { formatEther } from '@ethersproject/units';
 import Modal from "./Modal";
-import { updateTransaction } from "../hooks/useWeb3";
-import { Result } from "../types";
 import { Processing } from "./Processing";
 
 
@@ -20,7 +15,6 @@ interface TransactionModalProps {
     | Partial<ContractTransaction>
     | any;
     receipt: undefined | null | Record<string, never> | Partial<ContractReceipt>
-    result: Result | null | undefined;
 
 }
 
@@ -51,16 +45,22 @@ const ModalText = styled.p`
     font-size: 24px;
 `
 
+const Loading = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 40px;
+`
+
 const TransactionModal: React.FC<TransactionModalProps> = ({
     isOpen,
     closeModal,
     transaction,
     receipt,
-    result,
 }) => {
-    console.log(transaction,
-        receipt,
-        result, 'modal');
+    // console.log(transaction,'modal transaction');
+    // console.log(receipt,'modal receipt');
+
     if (transaction) {
         if ('failed' in transaction || (receipt && receipt.status === 0)) {
             return (
@@ -70,7 +70,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
                 </Modal>
             )
         }
-        if (transaction?.blockNumber && transaction?.confirmations) {
+        else if (transaction.confirmations >= 5) {
             return (
                 <Modal isOpen={isOpen} onClose={closeModal}>
                     <ModalComplete>Your Mint Is Complete!</ModalComplete>
@@ -79,7 +79,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         }
         return (
             <Modal isOpen={isOpen} onClose={closeModal}>
-                <Processing />
+                <Loading><Processing /></Loading>
                 <ModalTitle>Your Mint Is Processing</ModalTitle>
                 <ModalText>Your mint of NFT_NAME is processing</ModalText>
             </Modal>

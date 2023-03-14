@@ -7,6 +7,7 @@ import { RINKEBY, supportedChains } from '../config'
 
 const P = styled.p`
     padding: 10px;
+    color: #E64F54;
 `
 
 const Status = styled.button`

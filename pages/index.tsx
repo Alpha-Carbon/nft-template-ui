@@ -12,10 +12,10 @@ import OwnerAssets from '../src/components/AssetRender'
 const Home: Page = () => {
     // const { basePath } = useRouter()
     const [
-        { address, contractState, contract, defaultContract },
+        { address, contractState, contract, defaultContract,provider },
         actions,
     ] = useWeb3()
-    // console.log('contractState web3',contractState);
+    // console.log('contractState web3',assets);
     return (
         <div>
             <Head>
@@ -37,6 +37,7 @@ const Home: Page = () => {
                             contract={contract}
                             account={address}
                             readyToTransact={actions.ready}
+                            provider={provider}
                         />
                         <OwnerAssets
                             contractState={contractState}
