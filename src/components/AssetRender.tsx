@@ -93,8 +93,8 @@ const OwnerAssets: React.FC<Props> = ({
                         let newNft = await contract.tokenURI(owner);
                         newNft = decodeRendererV1(newNft);
                         nftArr.push(newNft)
-                        setAsset(nftArr);
                     }
+                    setAsset(nftArr);
                 } catch (e) {
                     console.log('e', e);
                 }
