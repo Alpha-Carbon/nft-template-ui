@@ -32,8 +32,8 @@ const ImageContainer = styled.div`
         height:128px;
     }
 
-    &>p {
-        margin:0px;
+    & p {
+        margin:4px 8px;
     }
 `
 

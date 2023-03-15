@@ -4,6 +4,7 @@ import styled, { css } from "styled-components";
 import Modal from "./Modal";
 import { Processing } from "./Processing";
 import { Done } from "./Done";
+import abi from '../abi/NftTemplateAbi.json';
 
 interface TransactionModalProps {
     isOpen: boolean;
@@ -65,7 +66,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
             return (
                 <Modal isOpen={isOpen} onClose={closeModal}>
                     <ModalFail>Your Mint Failed!</ModalFail>
-                    <ModalText>Transaction failed: {transaction.blockHash}</ModalText>
+                    <ModalText>Transaction failed {transaction.blockHash}</ModalText>
                 </Modal>
             )
         }

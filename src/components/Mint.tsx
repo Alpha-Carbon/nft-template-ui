@@ -165,7 +165,7 @@ const Mint: React.FC<MintedProps> = ({
     return (
         <Wrap>
             <MintedWrap>
-                <Minted>{totalSupply ? totalSupply.toNumber() / 1000 : 0 / 1000}% Minted</Minted>
+                <Minted>{totalSupply ? (totalSupply.toNumber() / 1000) * 100 : (0 / 1000) * 100}% Minted</Minted>
                 <Num>{totalSupply ? totalSupply.toString() : 0}/1000</Num>
             </MintedWrap>
             <ProcessBar>
