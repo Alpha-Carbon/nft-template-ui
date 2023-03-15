@@ -4,7 +4,6 @@ import styled, { css } from "styled-components";
 import Modal from "./Modal";
 import { Processing } from "./Processing";
 import { Done } from "./Done";
-import abi from '../abi/NftTemplateAbi.json';
 
 interface TransactionModalProps {
     isOpen: boolean;
