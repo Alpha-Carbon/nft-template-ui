@@ -93,18 +93,20 @@ const OwnerAssets: React.FC<Props> = ({
                 setAsset(null);
                 return;
             } else {
-                try {
-                    for (let i = 0; i < balanceOf; i++) {
+                for (let i = 0; i < balanceOf; i++) {
+                    try {
                         await delay(300);
                         const owner = await contract.tokenOfOwnerByIndex(account, i);
                         let newNft = await contract.tokenURI(owner);
                         newNft = decodeRendererV1(newNft);
                         nftArr.push(newNft)
+                    } catch (e) {
+                        console.log('e', e);
+                        i -= 1;
+                        await delay(3000);
                     }
-                    setAsset([...nftArr]);
-                } catch (e) {
-                    console.log('e', e);
                 }
+                setAsset([...nftArr]);
             }
         } else {
             setAsset(null);
@@ -113,7 +115,7 @@ const OwnerAssets: React.FC<Props> = ({
 
     useEffect(() => {
         (async () => {
-            getNft();
+            await getNft();
         })()
     }, [account, balanceOf])
 

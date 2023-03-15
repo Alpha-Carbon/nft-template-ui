@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import styled, { css } from "styled-components";
 import Modal from "./Modal";
 import { Processing } from "./Processing";
-
+import { Done } from "./Done";
 
 interface TransactionModalProps {
     isOpen: boolean;
@@ -46,7 +46,7 @@ const ModalText = styled.p`
     font-size: 24px;
 `
 
-const Loading = styled.div`
+const Icon = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
@@ -72,13 +72,14 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         else if (transaction.confirmations > 1) {
             return (
                 <Modal isOpen={isOpen} onClose={closeModal}>
+                    <Icon><Done /></Icon>
                     <ModalComplete>Your Mint Is Complete!</ModalComplete>
                 </Modal>
             )
         }
         return (
             <Modal isOpen={isOpen} onClose={closeModal}>
-                <Loading><Processing /></Loading>
+                <Icon><Processing /></Icon>
                 <ModalTitle>Your Mint Is Processing</ModalTitle>
                 <ModalText>Your mint of {name} is processing</ModalText>
             </Modal>
