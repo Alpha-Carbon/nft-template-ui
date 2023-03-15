@@ -203,9 +203,11 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
         if (!address || !defaultContract || !defaultProvider) {
             return
         } else {
+            defaultProvider.removeAllListeners();
+
             defaultProvider.on('block', () => {
                 (async () => {
-                    const b = await updateBalanceOf(address!, defaultContract);
+                    const b = await updateBalanceOf(address, defaultContract);
                     if (balanceOf === b) {
                         return;
                     } else {
