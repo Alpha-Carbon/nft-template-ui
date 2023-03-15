@@ -139,13 +139,13 @@ const Mint: React.FC<MintedProps> = ({
         try {
             setOpen(true);
             let res = await contract!.mint(account, { value: price });
-            if(provider) {
-                provider.on(res.hash, async ()=>{
+            if (provider) {
+                provider.on(res.hash, async () => {
                     await updateTransaction(res.hash).then(async (tx) => {
                         console.log('res transaction', tx);
                         setReceipt(tx.receipt);
                         setTransaction(tx.transaction);
-                        if(tx.transaction.confirmations > 1) {
+                        if (tx.transaction.confirmations > 1) {
                             console.log('clear');
                             provider.off(res.hash)
                         }
@@ -158,14 +158,14 @@ const Mint: React.FC<MintedProps> = ({
         }
     }
 
-    const totalSupply = useMemo(()=>{
+    const totalSupply = useMemo(() => {
         return total;
-    },[total])
+    }, [total])
 
     return (
         <Wrap>
             <MintedWrap>
-                <Minted>{totalSupply ? (totalSupply.toNumber() / 1000) * 100 : (0 / 1000) * 100}% Minted</Minted>
+                <Minted>{totalSupply ? (totalSupply.toNumber() * 100) / 1000 : 0 }% Minted</Minted>
                 <Num>{totalSupply ? totalSupply.toString() : 0}/1000</Num>
             </MintedWrap>
             <ProcessBar>
