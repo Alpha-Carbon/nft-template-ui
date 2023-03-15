@@ -213,6 +213,12 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
                     }
                 })()
             });
+            subscribeState(
+                defaultProvider,
+                defaultContract,
+                getCurrentState,
+                setContractState,
+            );
         }
     }, [address])
 

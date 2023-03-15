@@ -142,7 +142,7 @@ const OwnerAssets: React.FC<Props> = ({
 
     return (
         <>
-            <h3>Assets {total ? `(${total})` : null}</h3>
+            <h3>Assets {balanceOf ? `(${balanceOf})` : null}</h3>
             <ImageWrap>
                 {assets ? assets.map((asset) => {
                     return (
