@@ -199,12 +199,10 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
     }, [onboard, network, wallet]);
 
     useEffect(() => {
-        console.log('address', address);
         if (!address || !defaultContract || !defaultProvider) {
             return
         } else {
             defaultProvider.removeAllListeners();
-
             defaultProvider.on('block', () => {
                 (async () => {
                     const b = await updateBalanceOf(address, defaultContract);
@@ -217,6 +215,7 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
             });
         }
     }, [address])
+
 
     // console.log(wallet?.provider)
 
@@ -287,7 +286,7 @@ async function subscribeState(
 ) {
     try {
         // console.log(`current price ${currentState?.price}, new price ${price}`);
- 
+
         //#HACK, in case refresh event comes later than the last auto refresh from block updates
         //we should force update the forsale and auctionstarted (a full requery)
         provider.on('block', async () => {
@@ -315,7 +314,7 @@ export async function updateBalanceOf(
     address: string,
     contract: ethers.Contract
 ): Promise<number> {
-    console.log('update address' , address);
+    console.log('update address', address);
     return new Promise((resolve, reject) => {
         contract.balanceOf(address).then((b: BigNumber) => {
             resolve(Number(b._hex));
