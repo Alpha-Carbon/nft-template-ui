@@ -1,5 +1,5 @@
 import { BigNumber, ContractReceipt, ContractTransaction, ethers, providers } from "ethers";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styled, { css } from "styled-components";
 import { Button } from ".";
 import { ContractState } from "../utils/contract";
@@ -145,7 +145,7 @@ const Mint: React.FC<MintedProps> = ({
                         console.log('res transaction', tx);
                         setReceipt(tx.receipt);
                         setTransaction(tx.transaction);
-                        if(tx.transaction.confirmations >= 5) {
+                        if(tx.transaction.confirmations > 1) {
                             console.log('clear');
                             provider.off(res.hash)
                         }
@@ -158,11 +158,15 @@ const Mint: React.FC<MintedProps> = ({
         }
     }
 
+    const totalSupply = useMemo(()=>{
+        return total;
+    },[total])
+
     return (
         <Wrap>
             <MintedWrap>
-                <Minted>{total ? total.toNumber() / 1000 : 0 / 1000}% Minted</Minted>
-                <Num>{total ? total.toString() : 0}/1000</Num>
+                <Minted>{totalSupply ? totalSupply.toNumber() / 1000 : 0 / 1000}% Minted</Minted>
+                <Num>{totalSupply ? totalSupply.toString() : 0}/1000</Num>
             </MintedWrap>
             <ProcessBar>
                 <Process width={`calc(100% * (${total ? total.toNumber() : 0} / 1000))`} />

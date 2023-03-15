@@ -12,15 +12,15 @@ import OwnerAssets from '../src/components/AssetRender'
 const Home: Page = () => {
     // const { basePath } = useRouter()
     const [
-        { address, contractState, contract, defaultContract,provider },
+        { address, contractState, contract, defaultContract,provider, balanceOf},
         actions,
     ] = useWeb3()
-    // console.log('contractState web3',assets);
+    // console.log('contractState web3',contractState?.balanceOf);
     return (
         <div>
             <Head>
-                <title>MemeNumbers</title>
-                <meta name="description" content="MemeNumbers" />
+                <title>NFTemplate</title>
+                <meta name="description" content="NFTemplate" />
                 <link rel="icon" href={'/favicon.ico'} />
             </Head>
 
@@ -45,6 +45,7 @@ const Home: Page = () => {
                             account={address}
                             readyToTransact={actions.ready}
                             provider={provider}
+                            balanceOf={balanceOf}
                         />
                     </div>
                 )}

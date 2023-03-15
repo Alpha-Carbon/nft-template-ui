@@ -6,7 +6,7 @@ import React, {
     Dispatch,
     SetStateAction,
 } from "react";
-import { ContractReceipt, ContractTransaction, ethers, providers } from "ethers";
+import { BigNumber, ContractReceipt, ContractTransaction, ethers, providers } from "ethers";
 import { API, Wallet, Ens } from "bnc-onboard/dist/src/interfaces";
 
 import { ContractState, getContractState, updatePrice } from '../utils/contract'
@@ -24,7 +24,8 @@ interface ContextData {
     onboard?: API;
     contractState?: ContractState;
     contract?: ethers.Contract;
-    provider?: providers.JsonRpcProvider | undefined
+    provider?: providers.JsonRpcProvider | undefined;
+    balanceOf?: number;
     defaultContract: ethers.Contract;
 }
 
@@ -71,6 +72,8 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
     const [onboard, setOnboard] = useState<API>();
     const [contractState, setContractState] = useState<ContractState>();
     const [activeContract, setActiveContract] = useState<ethers.Contract>();
+    const [balanceOf, setBalanceOf] = useState<number>();
+
 
     //callback anchors
     const contractStateRef = useRef<ContractState>();
@@ -166,7 +169,7 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
             );
 
             // Get contract data and setup listeners on default contract
-            subscribeRefresh(defaultContract, setContractState);
+            // subscribeRefresh(defaultContract, setContractState);
 
             // Setup price refresh on defaultProvider
             subscribeState(
@@ -194,6 +197,24 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
             setNetwork(network);
         })();
     }, [onboard, network, wallet]);
+
+    useEffect(() => {
+        console.log('address', address);
+        if (!address || !defaultContract || !defaultProvider) {
+            return
+        } else {
+            defaultProvider.on('block', () => {
+                (async () => {
+                    const b = await updateBalanceOf(address!, defaultContract);
+                    if (balanceOf === b) {
+                        return;
+                    } else {
+                        setBalanceOf(b)
+                    }
+                })()
+            });
+        }
+    }, [address])
 
     // console.log(wallet?.provider)
 
@@ -233,7 +254,8 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
                     contractState,
                     contract: activeContract,
                     defaultContract,
-                    provider: defaultProvider
+                    provider: defaultProvider,
+                    balanceOf
                 },
                 { ready: readyToTransact, disconnect: disconnectWallet },
             ]}
@@ -262,27 +284,20 @@ async function subscribeState(
     setContractState: Dispatch<SetStateAction<ContractState | undefined>>,
 ) {
     try {
-        // console.log(`mainnet - ${block}!`)
-        const currentState = getCurrentState();
-        await delay(1000);
-        const price = await contract.currentPrice();
-        const total = await contract.totalSupply();
-        const name = await contract.name();
-
         // console.log(`current price ${currentState?.price}, new price ${price}`);
-
+ 
         //#HACK, in case refresh event comes later than the last auto refresh from block updates
         //we should force update the forsale and auctionstarted (a full requery)
-        if (currentState && currentState.price < price) {
-            const [total] = await Promise.all([
-                contract.totalSupply(),
-            ]);
-            setContractState({ price, total });
-        } else {
-            setContractState((prev: ContractState | undefined) => {
-                return prev ? { ...prev, price, total, name } : prev;
-            });
-        }
+        provider.on('block', async () => {
+            const currentState = getCurrentState();
+            await delay(2000);
+            const total = await contract.totalSupply();
+            if (currentState?.total && currentState?.total !== total) {
+                setContractState((prev: ContractState | undefined) => {
+                    return prev ? { ...prev, total } : prev;
+                });
+            }
+        })
     } catch (e) {
         console.error(`contract error: ${e}`);
     }
@@ -292,6 +307,20 @@ export async function updateTransaction(hash: string) {
     const transaction = await defaultProvider.getTransaction(hash);
     const receipt = await defaultProvider.getTransactionReceipt(hash);
     return { transaction, receipt };
+}
+
+export async function updateBalanceOf(
+    address: string,
+    contract: ethers.Contract
+): Promise<number> {
+    console.log('update address' , address);
+    return new Promise((resolve, reject) => {
+        contract.balanceOf(address).then((b: BigNumber) => {
+            resolve(Number(b._hex));
+        }).catch((error: Error) => {
+            reject(error)
+        })
+    })
 }
 
 export default function useWeb3() {

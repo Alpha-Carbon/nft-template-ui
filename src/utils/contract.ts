@@ -3,8 +3,9 @@ import { ethers, BigNumber } from 'ethers'
 export interface ContractState {
     // auctionStarted: BigNumber
     price: BigNumber
-    total?: BigNumber
+    total: BigNumber
     name?: string
+    balanceOf?: number
     // forSale: BigNumber[]
 }
 
@@ -31,3 +32,4 @@ export async function updatePrice(
         contract.currentPrice(),
     ])
 }
+

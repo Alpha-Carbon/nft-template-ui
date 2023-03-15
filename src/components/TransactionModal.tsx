@@ -60,9 +60,6 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     receipt,
     name,
 }) => {
-    // console.log(transaction,'modal transaction');
-    // console.log(receipt,'modal receipt');
-
     if (transaction) {
         if ('failed' in transaction || (receipt && receipt.status === 0)) {
             return (
@@ -72,7 +69,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
                 </Modal>
             )
         }
-        else if (transaction.confirmations >= 5) {
+        else if (transaction.confirmations > 1) {
             return (
                 <Modal isOpen={isOpen} onClose={closeModal}>
                     <ModalComplete>Your Mint Is Complete!</ModalComplete>

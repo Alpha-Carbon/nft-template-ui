@@ -6,6 +6,7 @@ import { AssetMetadata, decodeRendererV1 } from '../utils/decoding'
 import Modal from './Modal'
 import { Button } from '.'
 import { updateTransaction } from '../hooks/useWeb3'
+import delay from '../utils/delay'
 
 const ImageWrap = styled.div`
     display: flex;
@@ -65,6 +66,7 @@ interface Props {
     account?: string | null
     contract?: ethers.Contract
     provider?: providers.JsonRpcProvider | undefined
+    balanceOf?: number;
     contractState: ContractState
     readyToTransact: () => Promise<boolean>
 }
@@ -75,46 +77,46 @@ const OwnerAssets: React.FC<Props> = ({
     contractState,
     account,
     provider,
+    balanceOf,
     readyToTransact,
 }) => {
     const [assets, setAsset] = useState<AssetMetadata[] | null>();
     const [open, setOpen] = useState<boolean>(false);
     const [tokenId, setTokenId] = useState<number>();
-    const [total, setTotal] = useState<number>();
+
+    const { total } = contractState;
 
     const getNft = async () => {
-        if (contract) {
-            const balanceOf = await contract.balanceOf(account);
-            setTotal(balanceOf.toNumber());
+        if (contract && balanceOf) {
             const nftArr = [];
-            if (balanceOf.toNumber() === 0) {
+            if (balanceOf === 0) {
                 setAsset(null);
                 return;
             } else {
                 try {
-                    for (let i = 0; i < balanceOf.toNumber(); i++) {
+                    for (let i = 0; i < balanceOf; i++) {
+                        await delay(300);
                         const owner = await contract.tokenOfOwnerByIndex(account, i);
                         let newNft = await contract.tokenURI(owner);
                         newNft = decodeRendererV1(newNft);
                         nftArr.push(newNft)
+                        console.log('nftArr', nftArr);
                     }
-                    setAsset(nftArr);
+                    setAsset([...nftArr]);
                 } catch (e) {
                     console.log('e', e);
                 }
             }
-        }else {
+        } else {
             setAsset(null);
-            setTotal(0);
         }
     }
 
     useEffect(() => {
-        console.log('contract', contract);
         (async () => {
             getNft();
         })()
-    }, [account])
+    }, [account, balanceOf])
 
     const closeModal = () => {
         setOpen(false);
@@ -129,22 +131,9 @@ const OwnerAssets: React.FC<Props> = ({
         evt.preventDefault()
         let ready = await readyToTransact()
         if (!ready || !contract) return
-        console.log('provider', provider);
         try {
             const res = await contract.burn(tokenId).then(async (b: any) => {
                 closeModal();
-                if (provider) {
-                    provider.on(b.hash, async () => {
-                        await updateTransaction(b.hash).then((tx) => {
-                            console.log('burn tx', tx);
-                            if (tx.receipt) {
-                                provider.off(b.hash)
-                                getNft();
-                            }
-                        })
-                    })
-                }
-
             })
             // console.log('burn result:', res);
         } catch (e) {
