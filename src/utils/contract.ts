@@ -5,14 +5,14 @@ export interface ContractState {
     price: BigNumber
     total: BigNumber
     name?: string
-    balanceOf?: number
+    tokenBalance?: number
     // forSale: BigNumber[]
 }
 
 export async function getContractState(
     contract: ethers.Contract
 ): Promise<ContractState> {
-    console.log('querying contract...',contract)
+    console.log('querying contract...', contract)
     const [price, total] = await Promise.all([
         contract.currentPrice(),
         contract.totalSupply(),

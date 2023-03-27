@@ -25,7 +25,7 @@ interface ContextData {
     contractState?: ContractState;
     contract?: ethers.Contract;
     provider?: providers.JsonRpcProvider | undefined;
-    balanceOf?: number;
+    tokenBalance?: number;
     defaultContract: ethers.Contract;
 }
 
@@ -72,7 +72,7 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
     const [onboard, setOnboard] = useState<API>();
     const [contractState, setContractState] = useState<ContractState>();
     const [activeContract, setActiveContract] = useState<ethers.Contract>();
-    const [balanceOf, setBalanceOf] = useState<number>();
+    const [tokenBalance, setTokenBalance] = useState<number>();
 
 
     //callback anchors
@@ -205,11 +205,9 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
             defaultProvider.removeAllListeners();
             defaultProvider.on('block', () => {
                 (async () => {
-                    const b = await updateBalanceOf(address, defaultContract);
-                    if (balanceOf === b) {
-                        return;
-                    } else {
-                        setBalanceOf(b)
+                    const b = await updateBalance(address, defaultContract);
+                    if (tokenBalance !== b) {
+                        setTokenBalance(b);
                     }
                 })()
             });
@@ -242,6 +240,7 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
             } catch (e) {
                 console.error(e);
             }
+            console.log('disconnect')
             setBalance(undefined);
             setAddress(undefined);
             window.localStorage.removeItem("selectedWallet");
@@ -262,7 +261,7 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
                     contract: activeContract,
                     defaultContract,
                     provider: defaultProvider,
-                    balanceOf
+                    tokenBalance
                 },
                 { ready: readyToTransact, disconnect: disconnectWallet },
             ]}
@@ -316,7 +315,7 @@ export async function updateTransaction(hash: string) {
     return { transaction, receipt };
 }
 
-export async function updateBalanceOf(
+export async function updateBalance(
     address: string,
     contract: ethers.Contract
 ): Promise<number> {

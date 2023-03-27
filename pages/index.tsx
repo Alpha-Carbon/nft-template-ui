@@ -12,10 +12,9 @@ import OwnerAssets from '../src/components/AssetRender'
 const Home: Page = () => {
     // const { basePath } = useRouter()
     const [
-        { address, contractState, contract, defaultContract,provider, balanceOf},
+        { address, contractState, contract, defaultContract, provider, tokenBalance },
         actions,
     ] = useWeb3()
-    // console.log('contractState web3',contractState?.balanceOf);
     return (
         <div>
             <Head>
@@ -29,7 +28,7 @@ const Home: Page = () => {
 
                 {contractState && (
                     <div>
-                        <Descript 
+                        <Descript
                             name={contractState?.name}
                         />
                         <Mint
@@ -45,7 +44,7 @@ const Home: Page = () => {
                             account={address}
                             readyToTransact={actions.ready}
                             provider={provider}
-                            balanceOf={balanceOf}
+                            tokenBalance={tokenBalance}
                         />
                     </div>
                 )}
