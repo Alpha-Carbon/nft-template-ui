@@ -234,6 +234,8 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
     }
 
     const disconnectWallet = () => {
+        defaultContract && defaultContract.removeAllListeners();
+        defaultProvider && defaultProvider.removeAllListeners();
         if (onboard) {
             try {
                 onboard.walletReset();
@@ -241,8 +243,9 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
                 console.error(e);
             }
             console.log('disconnect')
-            setBalance(undefined);
             setAddress(undefined);
+            setBalance(undefined);
+            setTokenBalance(undefined);
             window.localStorage.removeItem("selectedWallet");
         }
     };
