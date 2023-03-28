@@ -13,14 +13,16 @@ export async function getContractState(
     contract: ethers.Contract
 ): Promise<ContractState> {
     console.log('querying contract...', contract)
-    const [price, total] = await Promise.all([
+    const [price, total, name] = await Promise.all([
         contract.currentPrice(),
         contract.totalSupply(),
+        contract.name(),
         // contract.getForSale(),
     ])
     return {
         price,
         total,
+        name,
         // forSale,
     }
 }
