@@ -59,6 +59,23 @@ const Buttons = styled.div`
     justify-content: center;
     align-items: center;
     gap: 24px;
+    margin-bottom: 30px;
+    &>button {
+        padding: 8px 16px;
+    }
+`
+
+const ModalTitle = styled.h3`
+    text-align: center;
+    font-weight: 700;
+    font-size: 32px;
+    margin-bottom: 24px;
+`
+
+const ModalText = styled.p`
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 40px;
 `
 
 interface Props {
@@ -158,8 +175,8 @@ const OwnerAssets: React.FC<Props> = ({
                     <h3>No Assets</h3>
                 }
                 <Modal isOpen={open} onClose={closeModal}>
-                    <h3>Confirm Burn</h3>
-                    <p>Burn token {tokenId}</p>
+                    <ModalTitle>Confirm Burn</ModalTitle>
+                    <ModalText>Burn token {tokenId}</ModalText>
                     <Buttons>
                         <Button onClick={closeModal} color="#ACACAC" >Cancel</Button>
                         <Button onClick={handleBurn}>Burn</Button>
