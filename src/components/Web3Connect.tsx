@@ -6,8 +6,14 @@ import { Button } from './'
 import { RINKEBY, supportedChains } from '../config'
 
 const P = styled.p`
-    padding: 10px;
-    color: #E64F54;
+    color: #FFFFFF;
+    font-weight: 700;
+    background: #AE1717;
+    border-radius: 20px;
+    border: 1px solid #FFFFFF;
+    padding: 10px 16px;
+    font-size: 16px;
+    line-height: 16px;
 `
 
 const Status = styled.button`
@@ -47,7 +53,6 @@ const Web3Connect: React.FC = () => {
         <>
             {/* {network && network === RINKEBY ? <P>(Rinkeby)</P> : null} */}
             {networkDisplay && <P>{networkDisplay}</P>}
-
             <Status
                 disabled={isConnected}
                 key="connect"
