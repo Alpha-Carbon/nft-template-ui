@@ -131,31 +131,49 @@ const Mint: React.FC<MintedProps> = ({
         }
     }
 
+    const WaitTransaction = async(hash:string)=> {
+        if (provider && hash) {
+            provider.on(hash, async () => {
+                await updateTransaction(hash).then(async (tx) => {
+                    console.log('res transaction', tx);
+                    setReceipt(tx.receipt);
+                    setTransaction(tx.transaction);
+                    if (tx.transaction.confirmations > 1) {
+                        console.log('clear');
+                        provider.off(hash)
+                    }
+                });
+            })
+            provider.once('error', () => {
+                setTransaction({ failed: true });
+                provider.off(hash);
+            })
+        }
+    }
+
     const handleMint = async (evt: any) => {
         evt.preventDefault()
         let ready = await readyToTransact()
         if (!ready || !contract) return
-
-        try {
-            setOpen(true);
-            let res = await contract!.mint(account, { value: price });
-            if (provider) {
-                provider.on(res.hash, async () => {
-                    await updateTransaction(res.hash).then(async (tx) => {
-                        console.log('res transaction', tx);
-                        setReceipt(tx.receipt);
-                        setTransaction(tx.transaction);
-                        if (tx.transaction.confirmations > 1) {
-                            console.log('clear');
-                            provider.off(res.hash)
-                        }
-                    });
-                })
+        setOpen(true);
+        if (num === 1) {
+            try {
+                let res = await contract!.mint(account, { value: price });
+                await WaitTransaction(res.hash);
+            } catch (e: any) {
+                console.log(`tx response: ${e.message}`)
+                setTransaction({ failed: true });
             }
-        } catch (e: any) {
-            console.log(`tx response: ${e.message}`)
-            setTransaction({ failed: true });
+        } else {
+            try {
+                let res = await contract!.mintBatch(account, num, { value: price });
+                await WaitTransaction(res.hash);
+            } catch (e: any) {
+                console.log(`tx response: ${e.message}`)
+                setTransaction({ failed: true });
+            }
         }
+
     }
 
     const totalSupply = useMemo(() => {
@@ -165,7 +183,7 @@ const Mint: React.FC<MintedProps> = ({
     return (
         <Wrap>
             <MintedWrap>
-                <Minted>{totalSupply ? (totalSupply.toNumber() * 100) / 1000 : 0 }% Minted</Minted>
+                <Minted>{totalSupply ? (totalSupply.toNumber() * 100) / 1000 : 0}% Minted</Minted>
                 <Num>{totalSupply ? totalSupply.toString() : 0}/1000</Num>
             </MintedWrap>
             <ProcessBar>
@@ -174,7 +192,7 @@ const Mint: React.FC<MintedProps> = ({
             <MintedWrap>
                 <Price>{formatEther(price)} <p>TACT</p></Price>
                 <BuyWrap>
-                    {/* <BuyNum>
+                    <BuyNum>
                         <button onClick={() => {
                             countNum('-')
                         }}>-</button>
@@ -182,7 +200,7 @@ const Mint: React.FC<MintedProps> = ({
                         <button onClick={() => {
                             countNum('+')
                         }}>+</button>
-                    </BuyNum> */}
+                    </BuyNum>
                     <Button onClick={handleMint}>Mint</Button>
                 </BuyWrap>
             </MintedWrap>
