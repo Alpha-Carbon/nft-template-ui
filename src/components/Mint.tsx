@@ -131,18 +131,22 @@ const Mint: React.FC<MintedProps> = ({
         }
     }
 
-    const WaitTransaction = async(hash:string)=> {
+    const WaitTransaction = async (hash: string) => {
         if (provider && hash) {
             provider.on(hash, async () => {
-                await updateTransaction(hash).then(async (tx) => {
-                    console.log('res transaction', tx);
-                    setReceipt(tx.receipt);
-                    setTransaction(tx.transaction);
-                    if (tx.transaction.confirmations > 1) {
-                        console.log('clear');
-                        provider.off(hash)
-                    }
-                });
+                try {
+                    await updateTransaction(hash).then(async (tx) => {
+                        console.log('res transaction', tx);
+                        setReceipt(tx.receipt);
+                        setTransaction(tx.transaction);
+                        if (tx.transaction.confirmations > 1) {
+                            console.log('clear');
+                            provider.off(hash)
+                        }
+                    });
+                } catch (e) {
+                    console.log('e', e);
+                }
             })
             provider.once('error', () => {
                 setTransaction({ failed: true });
