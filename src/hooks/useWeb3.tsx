@@ -130,11 +130,12 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
 
     useEffect(() => {
         (async () => {
-            console.log("network changed: ", network);
+            // console.log("network changed: ", network);
             if (!network || !onboard) return;
 
             if (!supportedChains.includes(network)) {
                 setActiveContract(undefined)
+                setTokenBalance(undefined)
                 return
             }
 
@@ -202,17 +203,21 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
         if (!address || !defaultContract || !defaultProvider) {
             return
         } else {
-            defaultProvider.removeAllListeners();
-            defaultProvider.on('block', async () => {
-                try {
-                    const b = await updateBalance(address, defaultContract);
-                    if (tokenBalance !== b) {
-                        setTokenBalance(b);
+            if (!activeContract) {
+                defaultProvider.removeAllListeners();
+            } else {
+                defaultProvider.removeAllListeners();
+                defaultProvider.on('block', async () => {
+                    try {
+                        const b = await updateBalance(address, defaultContract);
+                        if (tokenBalance !== b) {
+                            setTokenBalance(b);
+                        }
+                    } catch (e) {
+                        // console.log(e)
                     }
-                } catch (e) {
-                    console.log(e)
-                }
-            });
+                });
+            }
             subscribeState(
                 defaultProvider,
                 defaultContract,
@@ -220,7 +225,7 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
                 setContractState,
             );
         }
-    }, [address])
+    }, [address, activeContract])
 
 
     // console.log(wallet?.provider)
