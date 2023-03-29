@@ -83,7 +83,7 @@ interface Props {
     account?: string
     contract?: ethers.Contract
     provider?: providers.JsonRpcProvider
-    tokenBalance: number;
+    tokenBalance?: number;
     contractState: ContractState
     readyToTransact: () => Promise<boolean>
 }
@@ -124,9 +124,11 @@ const OwnerAssets: React.FC<Props> = ({
     const [tokenId, setTokenId] = useState<number>();
 
     useEffect(() => {
-        (async () => {
-            setAssetList(await getAssets(contract, account, tokenBalance));
-        })()
+        if(tokenBalance) {
+            (async () => {
+                setAssetList(await getAssets(contract, account, tokenBalance));
+            })()
+        }
     }, [contract, account, tokenBalance])
 
     const closeModal = () => {
