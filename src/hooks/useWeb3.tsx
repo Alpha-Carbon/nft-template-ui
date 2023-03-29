@@ -203,13 +203,15 @@ export const Web3Provider: React.FC<{}> = ({ children }) => {
             return
         } else {
             defaultProvider.removeAllListeners();
-            defaultProvider.on('block', () => {
-                (async () => {
+            defaultProvider.on('block', async () => {
+                try {
                     const b = await updateBalance(address, defaultContract);
                     if (tokenBalance !== b) {
                         setTokenBalance(b);
                     }
-                })()
+                } catch (e) {
+                    console.log(e)
+                }
             });
             subscribeState(
                 defaultProvider,
@@ -278,12 +280,17 @@ async function subscribeRefresh(
     contract: ethers.Contract,
     setContractState: Dispatch<SetStateAction<ContractState | undefined>>
 ) {
-    const contractState = await getContractState(defaultContract);
-    // contract.on("Refresh", async () => {
-    //     let currentState = await getContractState(defaultContract);
-    //     setContractState(currentState);
-    // });
-    setContractState(contractState);
+    try {
+        const contractState = await getContractState(defaultContract);
+
+        // contract.on("Refresh", async () => {
+        //     let currentState = await getContractState(defaultContract);
+        //     setContractState(currentState);
+        // });
+        setContractState(contractState);
+    } catch (e) {
+        // console.log(e);
+    }
 }
 
 async function subscribeState(
@@ -298,13 +305,17 @@ async function subscribeState(
         //#HACK, in case refresh event comes later than the last auto refresh from block updates
         //we should force update the forsale and auctionstarted (a full requery)
         provider.on('block', async () => {
-            const currentState = getCurrentState();
-            await delay(2000);
-            const total = await contract.totalSupply();
-            if (currentState?.total && currentState?.total !== total) {
-                setContractState((prev: ContractState | undefined) => {
-                    return prev ? { ...prev, total } : prev;
-                });
+            try {
+                const currentState = getCurrentState();
+                // await delay(2000);
+                const total = await contract.totalSupply();
+                if (currentState?.total && currentState?.total !== total) {
+                    setContractState((prev: ContractState | undefined) => {
+                        return prev ? { ...prev, total } : prev;
+                    });
+                }
+            } catch (e) {
+                // console.log(e);
             }
         })
     } catch (e) {
@@ -322,7 +333,6 @@ export async function updateBalance(
     address: string,
     contract: ethers.Contract
 ): Promise<number> {
-    console.log('update address', address);
     return new Promise((resolve, reject) => {
         contract.balanceOf(address).then((b: BigNumber) => {
             resolve(Number(b._hex));
