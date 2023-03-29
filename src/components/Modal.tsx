@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import ClearSVG from './Clear';
 interface ModalProps {
+  height?: string;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -36,8 +37,10 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
   z-index: 999;
 `;
 
-const ModalWrapper = styled.div`
+const ModalWrapper = styled.div<{ height: string }>`
+  box-sizing: border-box;
   width:80%;
+  height: ${({ height }) => height ? height : 'auto'};
   max-width: 640px;
   position: fixed;
   top: 50%;
@@ -45,7 +48,7 @@ const ModalWrapper = styled.div`
   transform: translate(-50%, -50%);
   background-color: white;
   border-radius: 10px;
-  padding: 1rem;
+  padding: 24px;
   z-index: 1000;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   animation: ${fadeIn} 0.3s ease-in-out;
@@ -58,9 +61,13 @@ const Close = styled.div`
   top: 24px;
 `
 
-const ModalContent = styled.div``;
+const ModalContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`;
 
-const Modal = ({ isOpen, onClose, children }: React.PropsWithChildren<ModalProps>) => {
+const Modal = ({ isOpen, onClose, children, height }: React.PropsWithChildren<ModalProps>) => {
   const handleOutsideClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (event.target === event.currentTarget) {
       onClose();
@@ -83,8 +90,8 @@ const Modal = ({ isOpen, onClose, children }: React.PropsWithChildren<ModalProps
 
   return (
     <ModalOverlay isOpen={isOpen} onClick={handleOutsideClick}>
-      <ModalWrapper>
-        <Close onClick={()=>{
+      <ModalWrapper height={height}>
+        <Close onClick={() => {
           onClose();
         }}><ClearSVG /></Close>
         <ModalContent>{children}</ModalContent>

@@ -3,10 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { ContractState } from '../utils/contract'
 import { AssetMetadata, decodeRendererV1 } from '../utils/decoding'
-import Modal from './Modal'
-import { Button } from '.'
-import { updateTransaction } from '../hooks/useWeb3'
-import delay from '../utils/delay'
+import { BornModal } from './BornModal'
 
 const ImageWrap = styled.div`
     display: flex;
@@ -37,7 +34,7 @@ const ImageContainer = styled.div`
     }
 `
 
-const Burn = styled.button`
+const Info = styled.button`
     cursor: pointer;
     background-color: #2B396A;
     outline: none;
@@ -52,30 +49,6 @@ const Burn = styled.button`
     justify-content: center;
     align-items: center;
     padding: 2px 14px;
-`
-
-const Buttons = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 24px;
-    margin-bottom: 30px;
-    &>button {
-        padding: 8px 16px;
-    }
-`
-
-const ModalTitle = styled.h3`
-    text-align: center;
-    font-weight: 700;
-    font-size: 32px;
-    margin-bottom: 24px;
-`
-
-const ModalText = styled.p`
-    text-align: center;
-    font-size: 24px;
-    margin-bottom: 40px;
 `
 
 interface Props {
@@ -98,7 +71,7 @@ const getAssets = async (contract: ethers.Contract | undefined, account: string 
                 const tokenId = await contract.tokenOfOwnerByIndex(account, i);
                 const token = await contract.tokenURI(tokenId);
                 const asset = decodeRendererV1(token);
-                console.log('asset', asset);
+                // console.log('asset', asset);
                 assetList.push(asset);
             } catch (e) {
                 console.log('e', e);
@@ -121,10 +94,10 @@ const OwnerAssets: React.FC<Props> = ({
 }) => {
     const [assetList, setAssetList] = useState<AssetMetadata[]>([]);
     const [open, setOpen] = useState<boolean>(false);
-    const [tokenId, setTokenId] = useState<number>();
+    const [asset, setAsset] = useState<AssetMetadata>();
 
     useEffect(() => {
-        if(tokenBalance) {
+        if (tokenBalance) {
             (async () => {
                 setAssetList(await getAssets(contract, account, tokenBalance));
             })()
@@ -135,9 +108,9 @@ const OwnerAssets: React.FC<Props> = ({
         setOpen(false);
     }
 
-    const openModal = (id: number) => {
+    const openModal = (asset: AssetMetadata) => {
         setOpen(true);
-        setTokenId(id);
+        setAsset(asset);
     }
 
     const handleBurn = async (evt: any) => {
@@ -145,7 +118,7 @@ const OwnerAssets: React.FC<Props> = ({
         let ready = await readyToTransact()
         if (!ready || !contract) return
         try {
-            const res = await contract.burn(tokenId).then(async (b: any) => {
+            const res = await contract.burn(asset?.name).then(async (b: any) => {
                 closeModal();
             })
             // console.log('burn result:', res);
@@ -163,22 +136,24 @@ const OwnerAssets: React.FC<Props> = ({
                         <ImageContainer key={asset.image}>
                             <img src={asset.image} />
                             <p>{asset.name}</p>
-                            <Burn onClick={(e) => {
-                                openModal(Number(asset.name))
-                            }}>Burn</Burn>
+                            <Info onClick={(e) => {
+                                openModal(asset)
+                            }}>Info</Info>
                         </ImageContainer>
                     )
                 }) :
                     <h3>No Assets</h3>
                 }
-                <Modal isOpen={open} onClose={closeModal}>
-                    <ModalTitle>Confirm Burn</ModalTitle>
-                    <ModalText>Burn token {tokenId}</ModalText>
-                    <Buttons>
-                        <Button onClick={closeModal} color="#ACACAC" >Cancel</Button>
-                        <Button onClick={handleBurn}>Burn</Button>
-                    </Buttons>
-                </Modal>
+                {
+                    asset && contract && readyToTransact && <BornModal
+                        asset={asset}
+                        open={open}
+                        setOpen={setOpen}
+                        contract={contract}
+                        readyToTransact={readyToTransact}
+                    />
+                }
+
             </ImageWrap>
         </>
     )
