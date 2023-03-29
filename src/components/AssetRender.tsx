@@ -80,12 +80,34 @@ const ModalText = styled.p`
 
 interface Props {
     metadata?: AssetMetadata;
-    account?: string | null
+    account?: string
     contract?: ethers.Contract
-    provider?: providers.JsonRpcProvider | undefined
-    tokenBalance?: number;
+    provider?: providers.JsonRpcProvider
+    tokenBalance: number;
     contractState: ContractState
     readyToTransact: () => Promise<boolean>
+}
+
+const getAssets = async (contract: ethers.Contract | undefined, account: string | undefined, tokenBalance: number) => {
+    const assetList = [];
+
+    if (contract && account && tokenBalance) {
+        for (let i = 0; i < tokenBalance; i++) {
+            try {
+                // await delay(300);
+                const tokenId = await contract.tokenOfOwnerByIndex(account, i);
+                const token = await contract.tokenURI(tokenId);
+                const asset = decodeRendererV1(token);
+                console.log('asset', asset);
+                assetList.push(asset);
+            } catch (e) {
+                console.log('e', e);
+                i -= 1;
+                // await delay(3000);
+            }
+        }
+    }
+    return assetList;
 }
 
 const OwnerAssets: React.FC<Props> = ({
@@ -97,42 +119,15 @@ const OwnerAssets: React.FC<Props> = ({
     tokenBalance,
     readyToTransact,
 }) => {
-    const [assetList, setAssetList] = useState<AssetMetadata[] | null>();
+    const [assetList, setAssetList] = useState<AssetMetadata[]>([]);
     const [open, setOpen] = useState<boolean>(false);
     const [tokenId, setTokenId] = useState<number>();
 
-    const getNft = async () => {
-        if (contract && tokenBalance) {
-            const nftArr = [];
-            if (tokenBalance === 0) {
-                setAssetList(null);
-                return;
-            } else {
-                for (let i = 0; i < tokenBalance; i++) {
-                    try {
-                        await delay(300);
-                        const tokenId = await contract.tokenOfOwnerByIndex(account, i);
-                        const token = await contract.tokenURI(tokenId);
-                        const asset = decodeRendererV1(token);
-                        nftArr.push(asset)
-                    } catch (e) {
-                        console.log('e', e);
-                        i -= 1;
-                        await delay(3000);
-                    }
-                }
-                setAssetList([...nftArr]);
-            }
-        } else {
-            setAssetList(null);
-        }
-    }
-
     useEffect(() => {
         (async () => {
-            await getNft();
+            setAssetList(await getAssets(contract, account, tokenBalance));
         })()
-    }, [account, tokenBalance])
+    }, [contract, account, tokenBalance])
 
     const closeModal = () => {
         setOpen(false);
@@ -161,7 +156,7 @@ const OwnerAssets: React.FC<Props> = ({
         <>
             <h3>Assets {tokenBalance ? `(${tokenBalance})` : null}</h3>
             <ImageWrap>
-                {assetList ? assetList.map((asset) => {
+                {assetList && assetList.length > 0 ? assetList.map((asset) => {
                     return (
                         <ImageContainer key={asset.image}>
                             <img src={asset.image} />
