@@ -10,7 +10,7 @@ import 'swiper/css/navigation';
 import { FreeMode, Navigation } from 'swiper';
 import RightSVG from "./Right"
 import LeftSVG from "./Left"
-import { AssetMetadata } from "../utils/decoding"
+import { AssetData } from "./AssetRender"
 
 
 const ModalTitle = styled.h3`
@@ -119,21 +119,21 @@ const Buttons = styled.div`
     }
 `
 
-type IBurnModal = {
-    asset: AssetMetadata;
+type IAssetInfoModal = {
+    asset: AssetData;
     open: boolean;
     setOpen: (boolean: boolean) => void;
     contract?: ethers.Contract
     readyToTransact: () => Promise<boolean>
 }
 
-export const BornModal = ({ asset, open, setOpen, readyToTransact, contract }: IBurnModal) => {
+export const AssetInfoModal = ({ asset, open, setOpen, readyToTransact, contract }: IAssetInfoModal) => {
 
-    const [born, setBorn] = useState<boolean>(false);
+    const [isBurnState, setIsBurnState] = useState<boolean>(false);
 
     const closeModal = () => {
         setOpen(false);
-        setBorn(false);
+        setIsBurnState(false);
     }
 
     const handleBurn = async (evt: any) => {
@@ -151,10 +151,10 @@ export const BornModal = ({ asset, open, setOpen, readyToTransact, contract }: I
 
     return (
         <Modal isOpen={open} onClose={closeModal} height={'590px'}>
-            {born ? <>
+            {isBurnState ? <>
                 <ModalContainer justifyContent={'center'}>
                     <ModalTitle>Confirm Burn</ModalTitle>
-                    <ModalText>Burn token {asset?.name}</ModalText>
+                    <ModalText>Burn token {asset?.tokenId}</ModalText>
                 </ModalContainer>
                 <Buttons>
                     <Button onClick={closeModal} color="#ACACAC" >Cancel</Button>
@@ -166,7 +166,7 @@ export const BornModal = ({ asset, open, setOpen, readyToTransact, contract }: I
                     <ModalContainer>
                         <ModalInput>
                             <label htmlFor="">Token ID</label>
-                            <p>{asset?.name}</p>
+                            <p>{asset?.tokenId}</p>
                         </ModalInput>
                         <ModalInput>
                             <label htmlFor="">Name</label>
@@ -177,7 +177,7 @@ export const BornModal = ({ asset, open, setOpen, readyToTransact, contract }: I
                             <p>{asset?.description}</p>
                         </ModalInput>
                         <ModalInput>
-                            <label htmlFor="">Atttributes</label>
+                            <label htmlFor="">Attributes</label>
                             <div className="swiper-wrap">
                                 <Swiper
                                     pagination={true}
@@ -188,7 +188,7 @@ export const BornModal = ({ asset, open, setOpen, readyToTransact, contract }: I
                                     slidesPerView={3}
                                     spaceBetween={16}
                                     freeMode={true}
-                                    modules={[FreeMode,Navigation]}
+                                    modules={[FreeMode, Navigation]}
                                     className="mySwiper"
                                 >
                                     {asset && asset.attributes.map((attr) => (
@@ -210,7 +210,7 @@ export const BornModal = ({ asset, open, setOpen, readyToTransact, contract }: I
                         </ModalInput>
                     </ModalContainer>
                     <Burn onClick={() => {
-                        setBorn(true);
+                        setIsBurnState(true);
                     }}>Burn</Burn>
                 </>
             }

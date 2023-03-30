@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { ContractState } from '../utils/contract'
 import { AssetMetadata, decodeRendererV1 } from '../utils/decoding'
-import { BornModal } from './BornModal'
+import { AssetInfoModal } from './AssetInfoModal'
 
 const ImageWrap = styled.div`
     display: flex;
@@ -61,7 +61,11 @@ interface Props {
     readyToTransact: () => Promise<boolean>
 }
 
-const getAssets = async (contract: ethers.Contract | undefined, account: string | undefined, tokenBalance: number) => {
+export type AssetData = AssetMetadata & {
+    tokenId: number;
+}
+
+const getAssets = async (contract: ethers.Contract | undefined, account: string | undefined, tokenBalance: number | undefined) => {
     const assetList = [];
 
     if (contract && account && tokenBalance) {
@@ -72,7 +76,7 @@ const getAssets = async (contract: ethers.Contract | undefined, account: string 
                 const token = await contract.tokenURI(tokenId);
                 const asset = decodeRendererV1(token);
                 // console.log('asset', asset);
-                assetList.push(asset);
+                assetList.push({ ...asset, tokenId: Number(tokenId._hex) });
             } catch (e) {
                 console.log('e', e);
                 i -= 1;
@@ -92,23 +96,21 @@ const OwnerAssets: React.FC<Props> = ({
     tokenBalance,
     readyToTransact,
 }) => {
-    const [assetList, setAssetList] = useState<AssetMetadata[]>([]);
+    const [assetList, setAssetList] = useState<AssetData[]>([]);
     const [open, setOpen] = useState<boolean>(false);
-    const [asset, setAsset] = useState<AssetMetadata>();
+    const [asset, setAsset] = useState<AssetData>();
 
     useEffect(() => {
-        if (tokenBalance) {
-            (async () => {
-                setAssetList(await getAssets(contract, account, tokenBalance));
-            })()
-        }
+        (async () => {
+            setAssetList(await getAssets(contract, account, tokenBalance));
+        })()
     }, [contract, account, tokenBalance])
 
     const closeModal = () => {
         setOpen(false);
     }
 
-    const openModal = (asset: AssetMetadata) => {
+    const openModal = (asset: AssetData) => {
         setOpen(true);
         setAsset(asset);
     }
@@ -145,7 +147,7 @@ const OwnerAssets: React.FC<Props> = ({
                     <h3>No Assets</h3>
                 }
                 {
-                    asset && contract && readyToTransact && <BornModal
+                    asset && contract && readyToTransact && <AssetInfoModal
                         asset={asset}
                         open={open}
                         setOpen={setOpen}
